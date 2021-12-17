@@ -46,3 +46,12 @@ Using the area we can identify the biggest rectangle at (2, 2) with  with width 
 Widths             |  Heights             |  Areas
 :-------------------------:|:-------------------------:|:-------------------------:
 <img width="300" src="https://github.com/lukasalexanderweber/lir/blob/readme/readme_imgs/span_map_widths.png" /> |  <img width="300" src="https://github.com/lukasalexanderweber/lir/blob/readme/readme_imgs/span_map_heights.png" /> |  <img width="300" src="https://github.com/lukasalexanderweber/lir/blob/readme/readme_imgs/span_map_areas.png" />
+
+### LIR based on outline
+
+Analysing all cells: 3.5
+Analysing only contour: 0.5s
+
+Even though the functionality is optimized using numba, analysing each cell of a raster is slow for big rasters. For a medium mask, resulting from an [image stitching process](https://github.com/lukasalexanderweber/opencv_stitching_tutorial/blob/master/Stitching%20Tutorial.ipynb) with 839 x 285 = ~240.000 cells identifying the LIR takes 3.5s on my system.   
+
+<img width="300" src="https://github.com/lukasalexanderweber/lir/blob/readme/test_data/mask.png" />
