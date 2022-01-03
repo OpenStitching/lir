@@ -1,6 +1,8 @@
 # lir
 Largest Interior Rectangle implementation in Python. 
 
+:rocket: Through Numba it is compiled to machine code “just-in-time” for execution at native machine code speed! 
+
 ### Acknowledgements
 
 Thanks to [Tim Swan](https://www.linkedin.com/in/tim-swan-14b1b/) for making his Largest Interior Rectangle implementation in C# [open source](https://github.com/Evryway/lir) and did a great [blog post](https://www.evryway.com/largest-interior/) about it. The first part was mainly reimplementing his solution in Python.
@@ -27,21 +29,13 @@ Horizontal Vector (2,2)             |  Vertical Vector (2,2)
 :-------------------------:|:-------------------------:
 <img width="300" src="https://github.com/lukasalexanderweber/lir/blob/readme/readme_imgs/h_vector.png" /> |  <img width="300" src="https://github.com/lukasalexanderweber/lir/blob/readme/readme_imgs/v_vector.png" />
 
-Using the `spans()` function, we get the following possible spans (width, height) for cell (2,2):
+So at the given cell the Horizontal Vector is (5,4) and the Vertical Vector is (7,4).
 
-```
-array([[5, 4],
-       [5, 4],
-       [5, 4],
-       [5, 4],
-       [4, 7],
-       [4, 7],
-       [4, 7]], dtype=uint32)
-```
+Reversing either vector lets you create the spans by zipping the vectors, so for example reversing the Vertical Vector to (4,7) gives a set of spans of (5 by 4) and (4 by 7).
 
 Since `4*7=28 > 5*4=20` a rectangle with width 4 and height 7 is the biggest possible rectangle for cell (2,2).
 The width and height is stored in a span map, where the widths and heights of the maximum rectangles are stored for all cells.
-Using the area we can identify the biggest rectangle at (2, 2) with  with width 4 and height 7. 
+Using the area we can identify the biggest rectangle at (2, 2) with width 4 and height 7. 
 
 Widths             |  Heights             |  Areas
 :-------------------------:|:-------------------------:|:-------------------------:
@@ -54,4 +48,4 @@ Analysing only contour: 0.5s
 
 Even though the functionality is optimized using numba, analysing each cell of a raster is slow for big rasters. For a medium mask, resulting from an [image stitching process](https://github.com/lukasalexanderweber/opencv_stitching_tutorial/blob/master/Stitching%20Tutorial.ipynb) with 839 x 285 = ~240.000 cells identifying the LIR takes 3.5s on my system.   
 
-<img width="300" src="https://github.com/lukasalexanderweber/lir/blob/readme/test_data/mask.png" />
+<img width="500" src="https://github.com/lukasalexanderweber/lir/blob/readme/test_data/mask.png" />
