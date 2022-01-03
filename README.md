@@ -51,4 +51,27 @@ Here how it works:
 
 <img width="200" src="https://github.com/lukasalexanderweber/lir/blob/readme/readme_imgs/outline_approach/cells2.png">
 
+We know that the LIR always touches the outline of the cell grid.
+For each cell in the outline the largest rectangle can be spanned in 4 different directions:
+
 <img width="300" src="https://github.com/lukasalexanderweber/lir/blob/readme/readme_imgs/outline_approach/directions.png">
+
+An outline cell can span into one (blue), two (green) or three (red) directions:
+
+<img width="300" src="https://github.com/lukasalexanderweber/lir/blob/readme/readme_imgs/outline_approach/direction_map.png">
+
+By calculating the spans in all possible directions we can obtain a span map as described above, using the largest span reprojected into left to right and top to bottom notation. 
+
+Widths             |  Heights             |  Areas
+:-------------------------:|:-------------------------:|:-------------------------:
+<img width="300" src="https://github.com/lukasalexanderweber/lir/blob/readme/readme_imgs/outline_approach/span_map_widths.png" /> |  <img width="300" src="https://github.com/lukasalexanderweber/lir/blob/readme/readme_imgs/outline_approach/span_map_heights.png" /> |  <img width="300" src="https://github.com/lukasalexanderweber/lir/blob/readme/readme_imgs/outline_approach/span_map_areas.png" />
+
+
+
+Cells with three directions can lead to cells which
+
+<img width="300" src="https://github.com/lukasalexanderweber/lir/blob/readme/readme_imgs/outline_approach/candidate_map.png">
+
+Widths             |  Heights             |  Areas
+:-------------------------:|:-------------------------:|:-------------------------:
+<img width="300" src="https://github.com/lukasalexanderweber/lir/blob/readme/readme_imgs/outline_approach/span_map2_widths.png" /> |  <img width="300" src="https://github.com/lukasalexanderweber/lir/blob/readme/readme_imgs/outline_approach/span_map2_heights.png" /> |  <img width="300" src="https://github.com/lukasalexanderweber/lir/blob/readme/readme_imgs/outline_approach/span_map2_areas.png" />
