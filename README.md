@@ -1,6 +1,8 @@
 # lir
 Largest Interior Rectangle implementation in Python. 
 
+<img height="100" src="https://github.com/lukasalexanderweber/lir/blob/readme/readme_imgs/sample1.png" /> <img height="100" src="https://github.com/lukasalexanderweber/lir/blob/readme/readme_imgs/sample2.png" /> <img height="100" src="https://github.com/lukasalexanderweber/lir/blob/readme/readme_imgs/sample3.png" /> <img height="100" src="https://github.com/lukasalexanderweber/lir/blob/readme/readme_imgs/sample4.png" />
+
 :rocket: Through [Numba](https://github.com/numba/numba) the Python code is compiled to machine code for execution at native machine code speed! 
 
 ### Acknowledgements
