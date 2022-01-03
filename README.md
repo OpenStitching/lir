@@ -1,7 +1,7 @@
 # lir
 Largest Interior Rectangle implementation in Python. 
 
-:rocket: Through Numba it is compiled to machine code “just-in-time” for execution at native machine code speed! 
+:rocket: Through Numba the Python code is compiled to machine code for execution at native machine code speed! 
 
 ### Acknowledgements
 
@@ -40,6 +40,8 @@ Using the area we can identify the biggest rectangle at (2, 2) with width 4 and 
 Widths             |  Heights             |  Areas
 :-------------------------:|:-------------------------:|:-------------------------:
 <img width="300" src="https://github.com/lukasalexanderweber/lir/blob/readme/readme_imgs/span_map_widths.png" /> |  <img width="300" src="https://github.com/lukasalexanderweber/lir/blob/readme/readme_imgs/span_map_heights.png" /> |  <img width="300" src="https://github.com/lukasalexanderweber/lir/blob/readme/readme_imgs/span_map_areas.png" />
+
+------------
 
 ### LIR based on outline
 
