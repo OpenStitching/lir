@@ -43,9 +43,8 @@ Widths             |  Heights             |  Areas
 
 ### LIR based on outline
 
-Analysing all cells: 3.5
-Analysing only contour: 0.5s
-
-Even though the functionality is optimized using numba, analysing each cell of a raster is slow for big rasters. For a medium mask, resulting from an [image stitching process](https://github.com/lukasalexanderweber/opencv_stitching_tutorial/blob/master/Stitching%20Tutorial.ipynb) with 839 x 285 = ~240.000 cells identifying the LIR takes 3.5s on my system.   
+Even though the functionality is optimized using numba, analysing each cell of a raster is slow for big rasters. For a medium mask, resulting from an [image stitching process](https://github.com/lukasalexanderweber/opencv_stitching_tutorial/blob/master/Stitching%20Tutorial.ipynb) with 839 x 285 = ~240.000 cells identifying the LIR takes 1.6s (without compilation time) on my system. Using the outline approach this time is cutted by half to 0.8s
 
 <img width="500" src="https://github.com/lukasalexanderweber/lir/blob/readme/test_data/mask.png" />
+
+
