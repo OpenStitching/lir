@@ -31,7 +31,7 @@ Horizontal Vector (2,2)             |  Vertical Vector (2,2)
 
 So at the given cell the Horizontal Vector is (5,4) and the Vertical Vector is (7,4).
 
-Reversing either vector lets you create the spans by zipping the vectors, so for example reversing the Vertical Vector to (4,7) gives a set of spans of (5 by 4) and (4 by 7).
+Reversing either vector lets you create the spans by stacking the vectors, so for example reversing the Vertical Vector to (4,7) gives a set of spans of (5 by 4) and (4 by 7).
 
 Since `4*7=28 > 5*4=20` a rectangle with width 4 and height 7 is the biggest possible rectangle for cell (2,2).
 The width and height is stored in a span map, where the widths and heights of the maximum rectangles are stored for all cells.
