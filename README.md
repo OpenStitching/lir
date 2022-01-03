@@ -1,7 +1,7 @@
 # lir
 Largest Interior Rectangle implementation in Python. 
 
-:rocket: Through Numba the Python code is compiled to machine code for execution at native machine code speed! 
+:rocket: Through [Numba](https://github.com/numba/numba) the Python code is compiled to machine code for execution at native machine code speed! 
 
 ### Acknowledgements
 
