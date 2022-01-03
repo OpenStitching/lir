@@ -49,4 +49,4 @@ Especially for bigger grids the functionality can be further optimized by only a
 
 Here an Example:
 
-<img width="200" src="https://github.com/lukasalexanderweber/lir/blob/readme/readme_imgs/cells2.png">
+<img width="200" src="https://github.com/lukasalexanderweber/lir/blob/readme/readme_imgs/outline_approach/cells2.png">
