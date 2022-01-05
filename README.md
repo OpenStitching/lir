@@ -67,13 +67,15 @@ Widths             |  Heights             |  Areas
 :-------------------------:|:-------------------------:|:-------------------------:
 <img width="300" src="https://github.com/lukasalexanderweber/lir/blob/main/readme_imgs/outline_approach/span_map_widths.png" /> |  <img width="300" src="https://github.com/lukasalexanderweber/lir/blob/main/readme_imgs/outline_approach/span_map_heights.png" /> |  <img width="300" src="https://github.com/lukasalexanderweber/lir/blob/main/readme_imgs/outline_approach/span_map_areas.png" />
 
-To analyse what happens here we'll have a closer look at cell (4,2). It can span into 3 directions: left, down and right. Going to left and down the maximum span is (3 by 7). The spans are noted in left2right and top2bottom notation. In this case, however, the width is calculated from right2left. We can transform it with the simple formula `x = cell_x - span_width + 1`, in this case `4 - 3 + 1 = 2`. Since the height is already calculated from top2bottom y doesn't change and the span (3 by 7) is allocated to cell (2,2)
+To analyse what happens here we'll have a closer look at cell (4,2). 
+
+<img width="200" src="https://github.com/lukasalexanderweber/lir/blob/main/readme_imgs/outline_approach/direction_map_cell_2_2.png">
+
+It can span into 3 directions: left, down and right. Going to left and down the maximum span is (3 by 7). The final spans are noted in left2right and top2bottom notation. In this case, however, the width is calculated from right2left. We can transform it with the simple formula `x = cell_x - span_width + 1`, in this case `4 - 3 + 1 = 2`. Since the height is already calculated from top2bottom y doesn't change and the span (3 by 7) is allocated to cell (2,2)
 
 (2,2) is the cell with the biggest area in the span map<sup>1</sup>. However, the information that the rectangle can be expanded to the right is missing. 
 
 <sup>1</sup> TODO cell (1,6) has the same area, there is no feedback to the user if multiple LIRs exist
-
-<img width="200" src="https://github.com/lukasalexanderweber/lir/blob/main/readme_imgs/outline_approach/direction_map_cell_2_2.png">
 
 So for "candidate cells" like (2,2) which do not lie on the outline we create a new span map (using left2right and top2bottom adjacencies):
 
