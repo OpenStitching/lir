@@ -9,7 +9,7 @@ def largest_interior_rectangle(cells):
     return biggest_span_in_span_map(s_map)
 
 
-@nb.njit('uint32[:,::1](uint8[:,::1])', parallel=True)
+@nb.njit('uint32[:,::1](uint8[:,::1])', parallel=True, cache=True)
 def horizontal_adjacency(cells):
     result = np.zeros((cells.shape[0], cells.shape[1]), dtype=np.uint32)
     for y in nb.prange(cells.shape[0]):
@@ -23,7 +23,7 @@ def horizontal_adjacency(cells):
     return result
 
 
-@nb.njit('uint32[:,::1](uint8[:,::1])', parallel=True)
+@nb.njit('uint32[:,::1](uint8[:,::1])', parallel=True, cache=True)
 def vertical_adjacency(cells):
     result = np.zeros((cells.shape[0], cells.shape[1]), dtype=np.uint32)
     for x in nb.prange(cells.shape[1]):
@@ -37,7 +37,7 @@ def vertical_adjacency(cells):
     return result
 
 
-@nb.njit('uint32(uint32[:])')
+@nb.njit('uint32(uint32[:])', cache=True)
 def predict_vector_size(array):
     zero_indices = np.where(array == 0)[0]
     if len(zero_indices) == 0:
@@ -47,7 +47,7 @@ def predict_vector_size(array):
     return zero_indices[0]
 
 
-@nb.jit('uint32[:](uint32[:,::1], uint32, uint32)')
+@nb.jit('uint32[:](uint32[:,::1], uint32, uint32)', cache=True)
 def h_vector(h_adjacency, x, y):
     vector_size = predict_vector_size(h_adjacency[y:, x])
     h_vector = np.zeros(vector_size, dtype=np.uint32)
@@ -59,7 +59,7 @@ def h_vector(h_adjacency, x, y):
     return h_vector
 
 
-@nb.jit('uint32[:](uint32[:,::1], uint32, uint32)')
+@nb.jit('uint32[:](uint32[:,::1], uint32, uint32)', cache=True)
 def v_vector(v_adjacency, x, y):
     vector_size = predict_vector_size(v_adjacency[y, x:])
     v_vector = np.zeros(vector_size, dtype=np.uint32)
@@ -71,13 +71,13 @@ def v_vector(v_adjacency, x, y):
     return v_vector
 
 
-@nb.njit('uint32[:,:](uint32[:], uint32[:])')
+@nb.njit('uint32[:,:](uint32[:], uint32[:])', cache=True)
 def spans(h_vector, v_vector):
     spans = np.stack((h_vector, v_vector[::-1]), axis=1)
     return spans
 
 
-@nb.njit('uint32[:](uint32[:,:])')
+@nb.njit('uint32[:](uint32[:,:])', cache=True)
 def biggest_span(spans):
     if len(spans) == 0:
         return np.array([0, 0], dtype=np.uint32)
@@ -86,7 +86,8 @@ def biggest_span(spans):
     return spans[biggest_span_index]
 
 
-@nb.njit('uint32[:, :, :](uint32[:,::1], uint32[:,::1])', parallel=True)
+@nb.njit('uint32[:, :, :](uint32[:,::1], uint32[:,::1])',
+         parallel=True, cache=True)
 def span_map(h_adjacency, v_adjacency):
     span_map = np.zeros((h_adjacency.shape[0],
                          h_adjacency.shape[1],
@@ -103,7 +104,7 @@ def span_map(h_adjacency, v_adjacency):
     return span_map
 
 
-@nb.njit('uint32[:](uint32[:, :, :])')
+@nb.njit('uint32[:](uint32[:, :, :])', cache=True)
 def biggest_span_in_span_map(span_map):
     areas = span_map[:, :, 0] * span_map[:, :, 1]
     largest_rectangle_indices = np.where(areas == np.amax(areas))
