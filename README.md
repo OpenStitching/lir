@@ -31,7 +31,7 @@ Horizontal Vector (2,2)             |  Vertical Vector (2,2)
 :-------------------------:|:-------------------------:
 <img width="300" src="https://github.com/lukasalexanderweber/lir/blob/main/readme_imgs/h_vector.png" /> |  <img width="300" src="https://github.com/lukasalexanderweber/lir/blob/main/readme_imgs/v_vector.png" />
 
-So at the given cell the Horizontal Vector is (5,4) and the Vertical Vector is (7,4).
+So at the given cell (2,2) the Horizontal Vector is (5,4) and the Vertical Vector is (7,4).
 
 Reversing either vector lets you create the spans by stacking the vectors, so for example reversing the Vertical Vector to (4,7) gives a set of spans of (5 by 4) and (4 by 7).
 
@@ -47,30 +47,37 @@ Widths             |  Heights             |  Areas
 
 ### LIR based on outline
 
-Especially for bigger grids the functionality can be further optimized by only analysing the outline. For a medium mask, resulting from an [image stitching process](https://github.com/lukasalexanderweber/opencv_stitching_tutorial/blob/master/Stitching%20Tutorial.ipynb) with 839 x 285 = ~240.000 cells identifying the LIR takes 1.6s (without compilation time) on my system. Using the outline approach this time is cutted by half to 0.8s. I assume but it needs to be analysed that the performance advantage increases with the grid size.
+Especially for bigger grids the functionality can be further optimized by only analysing the outline. Here are timings created by calculating the lir for [masks in different resolutions](https://github.com/lukasalexanderweber/lir/tree/performance_comparison/performance_comparison):
 
-Here is how it works:
+Timings             |  Timings (log transformed)
+:-------------------------:|:-------------------------:
+<img width="400" src="https://github.com/lukasalexanderweber/lir/blob/performance_comparison/performance_comparison/performance_comparison.svg" /> |  <img width="400" src="https://github.com/lukasalexanderweber/lir/blob/performance_comparison/performance_comparison/performance_comparison_log.svg" />
+
+The computation costs are saved by analysing only the outline pixels instead of all cells. We utilize the fact that the LIR always touches the outline of the cell grid. Here is how it works:
 
 <img width="200" src="https://github.com/lukasalexanderweber/lir/blob/main/readme_imgs/outline_approach/cells2.png">
 
-We know that the LIR always touches the outline of the cell grid.
 An outline cell can span into one (blue), two (green) or three (red) directions (up, down, left, right):
 
 <img width="200" src="https://github.com/lukasalexanderweber/lir/blob/main/readme_imgs/outline_approach/direction_map.png">
 
-By calculating the spans in all possible directions we can obtain a span map as described above, using the largest span reprojected into left to right and top to bottom notation. 
+By calculating the spans in all possible directions we can obtain a span map:
 
 Widths             |  Heights             |  Areas
 :-------------------------:|:-------------------------:|:-------------------------:
 <img width="300" src="https://github.com/lukasalexanderweber/lir/blob/main/readme_imgs/outline_approach/span_map_widths.png" /> |  <img width="300" src="https://github.com/lukasalexanderweber/lir/blob/main/readme_imgs/outline_approach/span_map_heights.png" /> |  <img width="300" src="https://github.com/lukasalexanderweber/lir/blob/main/readme_imgs/outline_approach/span_map_areas.png" />
 
-To analyse what happens here we'll have a closer look at cell (4,2). It can span into 3 directions: left, down and right. Going to left and down the maximum span is (3 by 7) which is apparently the cell with the biggest area in the span map<sup>1</sup>. However, the information that the rectangle can be expanded to the right is missing. 
-
-<sup>1</sup> TODO cell (1,6) has the same area, there is no feedback to the user if multiple LIRs exist
+To analyse what happens here we'll have a closer look at cell (4,2). 
 
 <img width="200" src="https://github.com/lukasalexanderweber/lir/blob/main/readme_imgs/outline_approach/direction_map_cell_2_2.png">
 
-So for "candidate cells" like (2,2) which do not lie on the outline we create a new span map (using left2right and top2bottom adjacencies):
+It can span into 3 directions: left, down and right. Going to left and down the maximum span is (3 by 7). The final spans are noted in left2right and top2bottom notation. In this case, however, the width is calculated from right2left. We can transform it with the simple formula `x = cell_x - span_width + 1`, in this case `4 - 3 + 1 = 2`. Since the height is already calculated from top2bottom y doesn't change and the span (3 by 7) is allocated to cell (2,2) (black dotted).
+
+(2,2) is the cell with the biggest area in the span map<sup>1</sup>. However, the information that the rectangle can be expanded to the right (turquoise dotted) is missing. 
+
+So for "candidate cells" like (2,2) which do not lie on the outline and come from outline cells going in 3 directions, we create a new span map (using left2right and top2bottom adjacencies):
+
+<sup>1</sup> TODO cell (1,6) has the same area, there is no feedback to the user if multiple LIRs exist
 
 <img width="200" src="https://github.com/lukasalexanderweber/lir/blob/main/readme_imgs/outline_approach/candidate_map.png">
 
@@ -78,4 +85,4 @@ Widths             |  Heights             |  Areas
 :-------------------------:|:-------------------------:|:-------------------------:
 <img width="300" src="https://github.com/lukasalexanderweber/lir/blob/main/readme_imgs/outline_approach/span_map2_widths.png" /> |  <img width="300" src="https://github.com/lukasalexanderweber/lir/blob/main/readme_imgs/outline_approach/span_map2_heights.png" /> |  <img width="300" src="https://github.com/lukasalexanderweber/lir/blob/main/readme_imgs/outline_approach/span_map2_areas.png" />
 
-The biggest spans of the two span maps are compared and the bigger one returned as lir, in this case cell (2,2) with a span (4 by 7)
+The biggest span of the two span maps are compared and the bigger one returned as lir, in this case cell (2,2) with a span (4 by 7)
