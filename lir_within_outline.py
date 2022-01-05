@@ -30,7 +30,7 @@ def get_outline(cells):
     return x_values, y_values
 
 
-@nb.njit('uint32[:,::1](uint8[:,::1], boolean)', parallel=True)
+@nb.njit('uint32[:,::1](uint8[:,::1], boolean)', parallel=True, cache=True)
 def horizontal_adjacency(cells, direction):
     result = np.zeros(cells.shape, dtype=np.uint32)
     for y in nb.prange(cells.shape[0]):
@@ -48,7 +48,7 @@ def horizontal_adjacency(cells, direction):
     return result
 
 
-@nb.njit('uint32[:,::1](uint8[:,::1], boolean)', parallel=True)
+@nb.njit('uint32[:,::1](uint8[:,::1], boolean)', parallel=True, cache=True)
 def vertical_adjacency(cells, direction):
     result = np.zeros(cells.shape, dtype=np.uint32)
     for x in nb.prange(cells.shape[1]):
@@ -66,7 +66,7 @@ def vertical_adjacency(cells, direction):
     return result
 
 
-@nb.njit
+@nb.njit(cache=True)
 def adjacencies_all_directions(cells):
     h_left2right = horizontal_adjacency(cells, 1)
     h_right2left = horizontal_adjacency(cells, 0)
@@ -75,7 +75,7 @@ def adjacencies_all_directions(cells):
     return h_left2right, h_right2left, v_top2bottom, v_bottom2top
 
 
-@nb.njit('uint32(uint32[:])')
+@nb.njit('uint32(uint32[:])', cache=True)
 def predict_vector_size(array):
     zero_indices = np.where(array == 0)[0]
     if len(zero_indices) == 0:
@@ -85,7 +85,7 @@ def predict_vector_size(array):
     return zero_indices[0]
 
 
-@nb.njit('uint32[:](uint32[:,::1], uint32, uint32)')
+@nb.njit('uint32[:](uint32[:,::1], uint32, uint32)', cache=True)
 def h_vector_top2bottom(h_adjacency, x, y):
     vector_size = predict_vector_size(h_adjacency[y:, x])
     h_vector = np.zeros(vector_size, dtype=np.uint32)
@@ -97,7 +97,7 @@ def h_vector_top2bottom(h_adjacency, x, y):
     return h_vector
 
 
-@nb.njit('uint32[:](uint32[:,::1], uint32, uint32)')
+@nb.njit('uint32[:](uint32[:,::1], uint32, uint32)', cache=True)
 def h_vector_bottom2top(h_adjacency, x, y):
     vector_size = predict_vector_size(np.flip(h_adjacency[:y+1, x]))
     h_vector = np.zeros(vector_size, dtype=np.uint32)
@@ -109,7 +109,7 @@ def h_vector_bottom2top(h_adjacency, x, y):
     return h_vector
 
 
-@nb.njit
+@nb.njit(cache=True)
 def h_vectors_all_directions(h_left2right, h_right2left, x, y):
     h_l2r_t2b = h_vector_top2bottom(h_left2right, x, y)
     h_r2l_t2b = h_vector_top2bottom(h_right2left, x, y)
@@ -118,7 +118,7 @@ def h_vectors_all_directions(h_left2right, h_right2left, x, y):
     return h_l2r_t2b, h_r2l_t2b, h_l2r_b2t, h_r2l_b2t
 
 
-@nb.njit('uint32[:](uint32[:,::1], uint32, uint32)')
+@nb.njit('uint32[:](uint32[:,::1], uint32, uint32)', cache=True)
 def v_vector_left2right(v_adjacency, x, y):
     vector_size = predict_vector_size(v_adjacency[y, x:])
     v_vector = np.zeros(vector_size, dtype=np.uint32)
@@ -130,7 +130,7 @@ def v_vector_left2right(v_adjacency, x, y):
     return v_vector
 
 
-@nb.njit('uint32[:](uint32[:,::1], uint32, uint32)')
+@nb.njit('uint32[:](uint32[:,::1], uint32, uint32)', cache=True)
 def v_vector_right2left(v_adjacency, x, y):
     vector_size = predict_vector_size(np.flip(v_adjacency[y, :x+1]))
     v_vector = np.zeros(vector_size, dtype=np.uint32)
@@ -142,7 +142,7 @@ def v_vector_right2left(v_adjacency, x, y):
     return v_vector
 
 
-@nb.njit
+@nb.njit(cache=True)
 def v_vectors_all_directions(v_top2bottom, v_bottom2top, x, y):
     v_l2r_t2b = v_vector_left2right(v_top2bottom, x, y)
     v_r2l_t2b = v_vector_right2left(v_top2bottom, x, y)
@@ -151,13 +151,13 @@ def v_vectors_all_directions(v_top2bottom, v_bottom2top, x, y):
     return v_l2r_t2b, v_r2l_t2b, v_l2r_b2t, v_r2l_b2t
 
 
-@nb.njit('uint32[:,:](uint32[:], uint32[:])')
+@nb.njit('uint32[:,:](uint32[:], uint32[:])', cache=True)
 def spans(h_vector, v_vector):
     spans = np.stack((h_vector, v_vector[::-1]), axis=1)
     return spans
 
 
-@nb.njit('uint32[:](uint32[:,:])')
+@nb.njit('uint32[:](uint32[:,:])', cache=True)
 def biggest_span(spans):
     if len(spans) == 0:
         return np.array([0, 0], dtype=np.uint32)
@@ -166,7 +166,7 @@ def biggest_span(spans):
     return spans[biggest_span_index]
 
 
-@nb.njit
+@nb.njit(cache=True)
 def spans_all_directions(h_vectors, v_vectors):
     span_l2r_t2b = spans(h_vectors[0], v_vectors[0])
     span_r2l_t2b = spans(h_vectors[1], v_vectors[1])
@@ -175,7 +175,7 @@ def spans_all_directions(h_vectors, v_vectors):
     return span_l2r_t2b, span_r2l_t2b, span_l2r_b2t, span_r2l_b2t
 
 
-@nb.njit
+@nb.njit(cache=True)
 def get_n_directions(spans_all_directions):
     n_directions = 1
     for spans in spans_all_directions:
@@ -186,7 +186,7 @@ def get_n_directions(spans_all_directions):
     return n_directions
 
 
-@nb.njit
+@nb.njit(cache=True)
 def get_xy_array(x, y, spans, mode=0):
     """0 - flip none, 1 - flip x, 2 - flip y, 3 - flip both"""
     xy = spans.copy()
@@ -202,7 +202,7 @@ def get_xy_array(x, y, spans, mode=0):
     return xy
 
 
-@nb.njit
+@nb.njit(cache=True)
 def get_xy_arrays(x, y, spans_all_directions):
     xy_l2r_t2b = get_xy_array(x, y, spans_all_directions[0], 0)
     xy_r2l_t2b = get_xy_array(x, y, spans_all_directions[1], 1)
@@ -211,7 +211,7 @@ def get_xy_arrays(x, y, spans_all_directions):
     return xy_l2r_t2b, xy_r2l_t2b, xy_l2r_b2t, xy_r2l_b2t
 
 
-@nb.njit
+@nb.njit(cache=True)
 def check_if_point_on_outline(x, y, outline):
     x_vals, y_vals = outline
     x_true = x_vals == x
@@ -221,7 +221,8 @@ def check_if_point_on_outline(x, y, outline):
 
 
 @nb.njit('Tuple((uint32[:,:,::1], uint8[:,::1], uint8[:,::1]))'
-         '(UniTuple(uint32[:], 2), UniTuple(uint32[:,::1], 4))', parallel=True)
+         '(UniTuple(uint32[:], 2), UniTuple(uint32[:,::1], 4))', 
+         parallel=True, cache=True)
 def create_maps(outline, adjacencies):
     x_values, y_values = outline
     h_left2right, h_right2left, v_top2bottom, v_bottom2top = adjacencies
@@ -263,7 +264,7 @@ def cells_of_interest(cells):
 
 @nb.njit('uint32[:, :, :]'
          '(uint32[:,::1], uint32[:,::1], UniTuple(uint32[:], 2))',
-         parallel=True)
+         parallel=True, cache=True)
 def span_map(h_adjacency_left2right,
              v_adjacency_top2bottom,
              cells_of_interest):
@@ -283,7 +284,7 @@ def span_map(h_adjacency_left2right,
     return span_map
 
 
-@nb.njit('uint32[:](uint32[:, :, :])')
+@nb.njit('uint32[:](uint32[:, :, :])', cache=True)
 def biggest_span_in_span_map(span_map):
     areas = span_map[:, :, 0] * span_map[:, :, 1]
     largest_rectangle_indices = np.where(areas == np.amax(areas))
