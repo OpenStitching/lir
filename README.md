@@ -51,7 +51,7 @@ Especially for bigger grids the functionality can be further optimized by only a
 
 Timings             |  Timings (log transformed)
 :-------------------------:|:-------------------------:
-<img width="400" src="https://github.com/lukasalexanderweber/lir/blob/performance_comparison/performance_comparison/performance_comparison.svg" /> |  <img width="400" src="https://github.com/lukasalexanderweber/lir/blob/performance_comparison/performance_comparison/performance_comparison_log.svg" />
+<img width="400" src="https://github.com/lukasalexanderweber/lir/blob/main/performance_comparison/performance_comparison.svg" /> |  <img width="400" src="https://github.com/lukasalexanderweber/lir/blob/main/performance_comparison/performance_comparison_log.svg" />
 
 The computation costs are saved by analysing only the outline pixels instead of all cells. We utilize the fact that the LIR always touches the outline of the cell grid. Here is how it works:
 
