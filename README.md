@@ -47,28 +47,29 @@ Widths             |  Heights             |  Areas
 
 ### LIR based on outline
 
-Especially for bigger grids the functionality can be further optimized by only analysing the outline. 
+Especially for bigger grids the functionality can be further optimized by only analysing the outline. This is analysed by calculating the lir for [masks in different resolutions](https://github.com/lukasalexanderweber/lir/tree/performance_comparison/performance_comparison).
 
 Timings             |  Timings (log transformed)
 :-------------------------:|:-------------------------:
 <img width="400" src="https://github.com/lukasalexanderweber/lir/blob/performance_comparison/performance_comparison/performance_comparison.svg" /> |  <img width="400" src="https://github.com/lukasalexanderweber/lir/blob/performance_comparison/performance_comparison/performance_comparison_log.svg" />
 
-Here is how it works:
+The computation costs are saved by analysing only the outline pixels instead of all cells. We utilize the fact that the LIR always touches the outline of the cell grid. Here is how it works:
 
 <img width="200" src="https://github.com/lukasalexanderweber/lir/blob/main/readme_imgs/outline_approach/cells2.png">
 
-We know that the LIR always touches the outline of the cell grid.
 An outline cell can span into one (blue), two (green) or three (red) directions (up, down, left, right):
 
 <img width="200" src="https://github.com/lukasalexanderweber/lir/blob/main/readme_imgs/outline_approach/direction_map.png">
 
-By calculating the spans in all possible directions we can obtain a span map as described above, using the largest span reprojected into left to right and top to bottom notation. 
+By calculating the spans in all possible directions we can obtain a span map:
 
 Widths             |  Heights             |  Areas
 :-------------------------:|:-------------------------:|:-------------------------:
 <img width="300" src="https://github.com/lukasalexanderweber/lir/blob/main/readme_imgs/outline_approach/span_map_widths.png" /> |  <img width="300" src="https://github.com/lukasalexanderweber/lir/blob/main/readme_imgs/outline_approach/span_map_heights.png" /> |  <img width="300" src="https://github.com/lukasalexanderweber/lir/blob/main/readme_imgs/outline_approach/span_map_areas.png" />
 
-To analyse what happens here we'll have a closer look at cell (4,2). It can span into 3 directions: left, down and right. Going to left and down the maximum span is (3 by 7) which is apparently the cell with the biggest area in the span map<sup>1</sup>. However, the information that the rectangle can be expanded to the right is missing. 
+To analyse what happens here we'll have a closer look at cell (4,2). It can span into 3 directions: left, down and right. Going to left and down the maximum span is (3 by 7) which is apparently the cell with the biggest area in the span map<sup>1</sup>. 
+
+However, the information that the rectangle can be expanded to the right is missing. 
 
 <sup>1</sup> TODO cell (1,6) has the same area, there is no feedback to the user if multiple LIRs exist
 
