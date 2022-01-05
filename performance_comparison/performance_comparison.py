@@ -1,4 +1,3 @@
-import unittest
 import os
 import sys
 from timeit import Timer
@@ -6,6 +5,7 @@ from timeit import Timer
 import numpy as np
 import cv2 as cv
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__),
                                                 '..')))
@@ -16,9 +16,9 @@ import lir_within_outline
 # %%
 
 
-c1 = cv.imread(os.path.join("performance_comparison", "mask_200w.png"), 0)
-c2 = cv.imread(os.path.join("performance_comparison", "mask_1000w.png"), 0)
-c3 = cv.imread(os.path.join("performance_comparison", "mask_5000w.png"), 0)
+c1 = cv.imread("mask_200w.png", 0)
+c2 = cv.imread("mask_3500w.png", 0)
+c3 = cv.imread("mask_5000w.png", 0)
 
 t = Timer(lambda: lir.largest_interior_rectangle(c1))
 lir1_1 = t.timeit(number=1)
@@ -40,7 +40,7 @@ lir2_3 = t.timeit(number=1)
 
 
 # create data
-x = [200*68/1000000,1000*340/1000000,5000*1700/1000000]
+x = [200*68/1000000,3500*1189/1000000,5000*1700/1000000]
 y1 = [lir1_1,lir1_2,lir1_3]
 y2 = [lir2_1,lir2_2,lir2_3]
 
@@ -50,4 +50,6 @@ plt.plot(x, y2, label = "lir_within_outline")
 plt.legend()
 plt.xlabel('Megapixel')
 plt.ylabel('time (s)')
-plt.show()
+#plt.yscale("log")
+#plt.gca().yaxis.set_major_formatter(ticker.FuncFormatter(lambda y, _: '{:g}'.format(y)))
+plt.savefig("performance_comparison.svg")
