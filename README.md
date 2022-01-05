@@ -47,7 +47,7 @@ Widths             |  Heights             |  Areas
 
 ### LIR based on outline
 
-Especially for bigger grids the functionality can be further optimized by only analysing the outline. Here are timings created by calculating the lir for [masks in different resolutions](https://github.com/lukasalexanderweber/lir/tree/performance_comparison/performance_comparison):
+Especially for bigger grids the functionality can be further optimized by only analysing the outline. Here are timings created by calculating the lir for [masks in different resolutions](https://github.com/lukasalexanderweber/lir/tree/main/performance_comparison):
 
 Timings             |  Timings (log transformed)
 :-------------------------:|:-------------------------:
