@@ -47,7 +47,11 @@ Widths             |  Heights             |  Areas
 
 ### LIR based on outline
 
-Especially for bigger grids the functionality can be further optimized by only analysing the outline. For a medium mask, resulting from an [image stitching process](https://github.com/lukasalexanderweber/opencv_stitching_tutorial/blob/master/Stitching%20Tutorial.ipynb) with 839 x 285 = ~240.000 cells identifying the LIR takes 1.6s (without compilation time) on my system. Using the outline approach this time is cutted by half to 0.8s. I assume but it needs to be analysed that the performance advantage increases with the grid size.
+Especially for bigger grids the functionality can be further optimized by only analysing the outline. 
+
+Timings             |  Timings (log transformed)
+:-------------------------:|:-------------------------:
+<img width="400" src="https://github.com/lukasalexanderweber/lir/blob/performance_comparison/performance_comparison/performance_comparison.svg" /> |  <img width="400" src="https://github.com/lukasalexanderweber/lir/blob/performance_comparison/performance_comparison/performance_comparison_log.svg" />
 
 Here is how it works:
 
