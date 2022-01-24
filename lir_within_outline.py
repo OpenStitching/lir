@@ -212,7 +212,7 @@ def get_xy_arrays(x, y, spans_all_directions):
 
 
 @nb.njit(cache=True)
-def check_if_point_on_outline(x, y, outline):
+def point_on_outline(x, y, outline):
     x_vals, y_vals = outline
     x_true = x_vals == x
     y_true = y_vals == y
@@ -221,7 +221,7 @@ def check_if_point_on_outline(x, y, outline):
 
 
 @nb.njit('Tuple((uint32[:,:,::1], uint8[:,::1], uint8[:,::1]))'
-         '(UniTuple(uint32[:], 2), UniTuple(uint32[:,::1], 4))', 
+         '(UniTuple(uint32[:], 2), UniTuple(uint32[:,::1], 4))',
          parallel=True, cache=True)
 def create_maps(outline, adjacencies):
     x_values, y_values = outline
@@ -248,9 +248,8 @@ def create_maps(outline, adjacencies):
                 w, h = span_array[span_idx][0], span_array[span_idx][1]
                 if w*h > span_map[y, x, 0] * span_map[y, x, 1]:
                     span_map[y, x, :] = np.array([w, h], "uint32")
-                if n == 3:
-                    if not check_if_point_on_outline(x, y, outline):
-                        saddle_candidates_map[y, x] = np.uint8(255)
+                if n == 3 and not point_on_outline(x, y, outline):
+                    saddle_candidates_map[y, x] = np.uint8(255)
 
     return span_map, direction_map, saddle_candidates_map
 
