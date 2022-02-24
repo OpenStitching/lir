@@ -3,8 +3,17 @@ import numba as nb
 import cv2 as cv
 
 
-def largest_interior_rectangle(cells):
-    outline = get_outline(cells)
+def get_outlines(cells):
+    contours, _ = \
+        cv.findContours(cells, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
+    for contour in contours:
+        contour = contour[:, 0, :]
+        x_values = contour[:, 0].astype("uint32", order="C")
+        y_values = contour[:, 1].astype("uint32", order="C")
+        yield x_values, y_values
+
+
+def largest_interior_rectangle(cells, outline):
     adjacencies = adjacencies_all_directions(cells)
     s_map, _, saddle_candidates_map = create_maps(outline, adjacencies)
     lir1 = biggest_span_in_span_map(s_map)
@@ -15,19 +24,6 @@ def largest_interior_rectangle(cells):
 
     lir = biggest_rectangle(lir1, lir2)
     return lir
-
-
-def get_outline(cells):
-    contours, hierarchy = \
-        cv.findContours(cells, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
-    # TODO support multiple contours
-    # test that only one regular contour exists
-    assert hierarchy.shape == (1, 1, 4)
-    assert np.all(hierarchy == -1)
-    contour = contours[0][:, 0, :]
-    x_values = contour[:, 0].astype("uint32", order="C")
-    y_values = contour[:, 1].astype("uint32", order="C")
-    return x_values, y_values
 
 
 @nb.njit('uint32[:,::1](uint8[:,::1], boolean)', parallel=True, cache=True)

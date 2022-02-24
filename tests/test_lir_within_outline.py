@@ -29,12 +29,17 @@ class TestLIR(unittest.TestCase):
                           [0, 0, 0, 1, 0, 1, 0, 0, 0]])
         cells = np.uint8(cells * 255)
 
-        rect = lir.largest_interior_rectangle(cells)
+        outline = next(lir.get_outlines(cells))
+        rect = lir.largest_interior_rectangle(cells, outline)
+
         np.testing.assert_array_equal(rect, np.array([2, 2, 4, 7]))
 
     def test_img(self):
         cells = cv.imread("mask.png", 0)
-        rect = lir.largest_interior_rectangle(cells)
+
+        outline = next(lir.get_outlines(cells))
+        rect = lir.largest_interior_rectangle(cells, outline)
+
         np.testing.assert_array_equal(rect, np.array([4, 20, 834, 213]))
 
         # # PLOT
