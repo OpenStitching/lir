@@ -28,7 +28,7 @@ class TestLIR(unittest.TestCase):
 
         h = lir.horizontal_adjacency(cells)
         v = lir.vertical_adjacency(cells)
-        span_map = lir.span_map(h, v)
+        span_map = lir.span_map(cells, h, v)
         rect = lir.biggest_span_in_span_map(span_map)
         rect2 = lir.largest_interior_rectangle(cells)
 

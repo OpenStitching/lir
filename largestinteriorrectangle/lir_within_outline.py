@@ -6,7 +6,7 @@ from .lir import horizontal_adjacency as horizontal_adjacency_left2right
 from .lir import vertical_adjacency as vertical_adjacency_top2bottom
 from .lir import h_vector as h_vector_top2bottom
 from .lir import v_vector as v_vector_left2right
-from .lir import (predict_vector_size, spans, biggest_span,
+from .lir import (predict_vector_size, spans, span_map,
                   biggest_span_in_span_map)
 
 
@@ -25,8 +25,7 @@ def largest_interior_rectangle(cells, outline):
     s_map, _, saddle_candidates_map = create_maps(outline, adjacencies)
     lir1 = biggest_span_in_span_map(s_map)
 
-    candidate_cells = cells_of_interest(saddle_candidates_map)
-    s_map = span_map(adjacencies[0], adjacencies[2], candidate_cells)
+    s_map = span_map(saddle_candidates_map, adjacencies[0], adjacencies[2])
     lir2 = biggest_span_in_span_map(s_map)
 
     lir = biggest_rectangle(lir1, lir2)
@@ -198,35 +197,6 @@ def create_maps(outline, adjacencies):
                     saddle_candidates_map[y, x] = True
 
     return span_map, direction_map, saddle_candidates_map
-
-
-def cells_of_interest(cells):
-    y_vals, x_vals = cells.nonzero()
-    x_vals = x_vals.astype("uint32", order="C")
-    y_vals = y_vals.astype("uint32", order="C")
-    return x_vals, y_vals
-
-
-@nb.njit('uint32[:, :, :]'
-         '(uint32[:,::1], uint32[:,::1], UniTuple(uint32[:], 2))',
-         parallel=True, cache=True)
-def span_map(h_adjacency_left2right,
-             v_adjacency_top2bottom,
-             cells_of_interest):
-
-    x_values, y_values = cells_of_interest
-
-    span_map = np.zeros(h_adjacency_left2right.shape + (2,), dtype=np.uint32)
-
-    for idx in nb.prange(len(x_values)):
-        x, y = x_values[idx], y_values[idx]
-        h_vector = h_vector_top2bottom(h_adjacency_left2right, x, y)
-        v_vector = v_vector_left2right(v_adjacency_top2bottom, x, y)
-        s = spans(h_vector, v_vector)
-        s = biggest_span(s)
-        span_map[y, x, :] = s
-
-    return span_map
 
 
 def biggest_rectangle(*args):

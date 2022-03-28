@@ -5,7 +5,7 @@ import numba as nb
 def largest_interior_rectangle(cells):
     h_adjacency = horizontal_adjacency(cells)
     v_adjacency = vertical_adjacency(cells)
-    s_map = span_map(h_adjacency, v_adjacency)
+    s_map = span_map(cells, h_adjacency, v_adjacency)
     return biggest_span_in_span_map(s_map)
 
 
@@ -86,20 +86,20 @@ def biggest_span(spans):
     return spans[biggest_span_index]
 
 
-@nb.njit('uint32[:, :, :](uint32[:,::1], uint32[:,::1])',
+@nb.njit('uint32[:, :, :](boolean[:,::1], uint32[:,::1], uint32[:,::1])',
          parallel=True, cache=True)
-def span_map(h_adjacency, v_adjacency):
-    span_map = np.zeros((h_adjacency.shape[0],
-                         h_adjacency.shape[1],
-                         2), dtype=np.uint32)
+def span_map(cells, h_adjacency, v_adjacency):
 
-    for x in nb.prange(span_map.shape[1]):
-        for y in range(span_map.shape[0]):
-            h_vec = h_vector(h_adjacency, x, y)
-            v_vec = v_vector(v_adjacency, x, y)
-            s = spans(h_vec, v_vec)
-            s = biggest_span(s)
-            span_map[y, x, :] = s
+    y_values, x_values = cells.nonzero()
+    span_map = np.zeros(cells.shape + (2,), dtype=np.uint32)
+
+    for idx in nb.prange(len(x_values)):
+        x, y = x_values[idx], y_values[idx]
+        h_vec = h_vector(h_adjacency, x, y)
+        v_vec = v_vector(v_adjacency, x, y)
+        s = spans(h_vec, v_vec)
+        s = biggest_span(s)
+        span_map[y, x, :] = s
 
     return span_map
 
