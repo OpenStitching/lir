@@ -33,13 +33,13 @@ def largest_interior_rectangle(cells, outline):
     return lir
 
 
-@nb.njit('uint32[:,::1](uint8[:,::1])', parallel=True, cache=True)
+@nb.njit('uint32[:,::1](boolean[:,::1])', parallel=True, cache=True)
 def horizontal_adjacency_right2left(cells):
     result = np.zeros(cells.shape, dtype=np.uint32)
     for y in nb.prange(cells.shape[0]):
         span = 0
         for x in range(cells.shape[1]):
-            if cells[y, x] > 0:
+            if cells[y, x]:
                 span += 1
             else:
                 span = 0
@@ -47,13 +47,13 @@ def horizontal_adjacency_right2left(cells):
     return result
 
 
-@nb.njit('uint32[:,::1](uint8[:,::1])', parallel=True, cache=True)
+@nb.njit('uint32[:,::1](boolean[:,::1])', parallel=True, cache=True)
 def vertical_adjacency_bottom2top(cells):
     result = np.zeros(cells.shape, dtype=np.uint32)
     for x in nb.prange(cells.shape[1]):
         span = 0
         for y in range(cells.shape[0]):
-            if cells[y, x] > 0:
+            if cells[y, x]:
                 span += 1
             else:
                 span = 0

@@ -24,7 +24,7 @@ class TestLIR(unittest.TestCase):
                           [1, 1, 1, 1, 1, 1, 0, 0, 0],
                           [1, 1, 0, 0, 0, 1, 1, 1, 1],
                           [0, 0, 0, 0, 0, 0, 0, 0, 0]])
-        cells = np.uint8(cells * 255)
+        cells = cells > 0
 
         h = lir.horizontal_adjacency(cells)
         v = lir.vertical_adjacency(cells)
@@ -42,7 +42,7 @@ class TestLIR(unittest.TestCase):
                           [1, 0, 0],
                           [1, 0, 0],
                           [1, 1, 1]])
-        cells = np.uint8(cells * 255)
+        cells = cells > 0
 
         h = lir.horizontal_adjacency(cells)
         v = lir.vertical_adjacency(cells)
@@ -73,6 +73,7 @@ class TestLIR(unittest.TestCase):
 
     def test_img(self):
         cells = cv.imread(os.path.join(TEST_DIR, "testdata", "mask.png"), 0)
+        cells = cells > 0
         rect = lir.largest_interior_rectangle(cells)
         np.testing.assert_array_equal(rect, np.array([4, 20, 834, 213]))
 

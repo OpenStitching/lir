@@ -16,6 +16,8 @@ class TestLIR(unittest.TestCase):
                           0)
 
         outlines = list(lir.get_outlines(cells))
+        cells = cells > 0
+
         rect1 = lir.largest_interior_rectangle(cells, outlines[0])
         rect2 = lir.largest_interior_rectangle(cells, outlines[1])
 

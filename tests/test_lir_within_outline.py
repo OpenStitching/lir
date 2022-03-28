@@ -23,9 +23,11 @@ class TestLIR(unittest.TestCase):
                           [0, 1, 1, 1, 1, 1, 1, 1, 0],
                           [0, 0, 1, 1, 0, 1, 1, 0, 0],
                           [0, 0, 0, 1, 0, 1, 0, 0, 0]])
-        cells = np.uint8(cells * 255)
 
+        cells = np.uint8(cells * 255)
         outline = next(lir.get_outlines(cells))
+        cells = cells > 0
+
         rect = lir.largest_interior_rectangle(cells, outline)
 
         np.testing.assert_array_equal(rect, np.array([2, 2, 4, 7]))
@@ -34,6 +36,8 @@ class TestLIR(unittest.TestCase):
         cells = cv.imread(os.path.join(TEST_DIR, "testdata", "mask.png"), 0)
 
         outline = next(lir.get_outlines(cells))
+        cells = cells > 0
+
         rect = lir.largest_interior_rectangle(cells, outline)
 
         np.testing.assert_array_equal(rect, np.array([4, 20, 834, 213]))
