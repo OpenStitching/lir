@@ -166,7 +166,7 @@ def point_on_outline(x, y, outline):
     return np.any(both_true)
 
 
-@nb.njit('Tuple((uint32[:,:,::1], uint8[:,::1], uint8[:,::1]))'
+@nb.njit('Tuple((uint32[:,:,::1], uint8[:,::1], boolean[:,::1]))'
          '(UniTuple(uint32[:], 2), UniTuple(uint32[:,::1], 4))',
          parallel=True, cache=True)
 def create_maps(outline, adjacencies):
@@ -176,7 +176,7 @@ def create_maps(outline, adjacencies):
     shape = h_left2right.shape
     span_map = np.zeros(shape + (2,), "uint32")
     direction_map = np.zeros(shape, "uint8")
-    saddle_candidates_map = np.zeros(shape, "uint8")
+    saddle_candidates_map = np.zeros(shape, "bool_")
 
     for idx in nb.prange(len(x_values)):
         x, y = x_values[idx], y_values[idx]
@@ -195,7 +195,7 @@ def create_maps(outline, adjacencies):
                 if w*h > span_map[y, x, 0] * span_map[y, x, 1]:
                     span_map[y, x, :] = np.array([w, h], "uint32")
                 if n == 3 and not point_on_outline(x, y, outline):
-                    saddle_candidates_map[y, x] = np.uint8(255)
+                    saddle_candidates_map[y, x] = True
 
     return span_map, direction_map, saddle_candidates_map
 
