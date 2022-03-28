@@ -47,7 +47,7 @@ def predict_vector_size(array):
     return zero_indices[0]
 
 
-@nb.jit('uint32[:](uint32[:,::1], uint32, uint32)', cache=True)
+@nb.njit('uint32[:](uint32[:,::1], uint32, uint32)', cache=True)
 def h_vector(h_adjacency, x, y):
     vector_size = predict_vector_size(h_adjacency[y:, x])
     h_vector = np.zeros(vector_size, dtype=np.uint32)
@@ -59,7 +59,7 @@ def h_vector(h_adjacency, x, y):
     return h_vector
 
 
-@nb.jit('uint32[:](uint32[:,::1], uint32, uint32)', cache=True)
+@nb.njit('uint32[:](uint32[:,::1], uint32, uint32)', cache=True)
 def v_vector(v_adjacency, x, y):
     vector_size = predict_vector_size(v_adjacency[y, x:])
     v_vector = np.zeros(vector_size, dtype=np.uint32)
