@@ -1,22 +1,19 @@
 import unittest
 import os
-import sys
 
 import numpy as np
 import cv2 as cv
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                                '..')))
+from .context import lir_within_outline as lir
 
-import lir_within_outline as lir
-
-# %%
+TEST_DIR = os.path.abspath(os.path.dirname(__file__))
 
 
 class TestLIR(unittest.TestCase):
 
     def test_multiple_shapes(self):
-        cells = cv.imread("two_shapes.png", 0)
+        cells = cv.imread(os.path.join(TEST_DIR, "testdata", "two_shapes.png"),
+                          0)
 
         outlines = list(lir.get_outlines(cells))
         rect1 = lir.largest_interior_rectangle(cells, outlines[0])

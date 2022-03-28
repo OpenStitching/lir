@@ -1,16 +1,12 @@
 import unittest
 import os
-import sys
 
 import numpy as np
 import cv2 as cv
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                                '..')))
+from .context import lir
 
-import lir
-
-# %%
+TEST_DIR = os.path.abspath(os.path.dirname(__file__))
 
 
 class TestLIR(unittest.TestCase):
@@ -76,7 +72,7 @@ class TestLIR(unittest.TestCase):
         self.assertEqual(lir.predict_vector_size(t5), 0)
 
     def test_img(self):
-        cells = cv.imread("mask.png", 0)
+        cells = cv.imread(os.path.join(TEST_DIR, "testdata", "mask.png"), 0)
         rect = lir.largest_interior_rectangle(cells)
         np.testing.assert_array_equal(rect, np.array([4, 20, 834, 213]))
 
