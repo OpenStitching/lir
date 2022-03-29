@@ -1,28 +1,19 @@
 import numpy as np
 import numba as nb
-import cv2 as cv
 
-from .lir import horizontal_adjacency as horizontal_adjacency_left2right
-from .lir import vertical_adjacency as vertical_adjacency_top2bottom
-from .lir import h_vector as h_vector_top2bottom
-from .lir import v_vector as v_vector_left2right
-from .lir import (predict_vector_size, spans, span_map,
-                  biggest_span_in_span_map)
-
-
-def get_outlines(cells):
-    contours, _ = \
-        cv.findContours(cells, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
-    for contour in contours:
-        contour = contour[:, 0, :]
-        x_values = contour[:, 0].astype("uint32", order="C")
-        y_values = contour[:, 1].astype("uint32", order="C")
-        yield x_values, y_values
+from .lir_basis import horizontal_adjacency as horizontal_adjacency_left2right
+from .lir_basis import vertical_adjacency as vertical_adjacency_top2bottom
+from .lir_basis import h_vector as h_vector_top2bottom
+from .lir_basis import v_vector as v_vector_left2right
+from .lir_basis import (predict_vector_size, spans, span_map,
+                        biggest_span_in_span_map)
 
 
-def largest_interior_rectangle(cells, outline):
-    adjacencies = adjacencies_all_directions(cells)
-    s_map, _, saddle_candidates_map = create_maps(outline, adjacencies)
+def largest_interior_rectangle(grid, contour):
+    adjacencies = adjacencies_all_directions(grid)
+    contour = contour.astype("uint32", order="C")
+
+    s_map, _, saddle_candidates_map = create_maps(adjacencies, contour)
     lir1 = biggest_span_in_span_map(s_map)
 
     s_map = span_map(saddle_candidates_map, adjacencies[0], adjacencies[2])
@@ -33,12 +24,12 @@ def largest_interior_rectangle(cells, outline):
 
 
 @nb.njit('uint32[:,::1](boolean[:,::1])', parallel=True, cache=True)
-def horizontal_adjacency_right2left(cells):
-    result = np.zeros(cells.shape, dtype=np.uint32)
-    for y in nb.prange(cells.shape[0]):
+def horizontal_adjacency_right2left(grid):
+    result = np.zeros(grid.shape, dtype=np.uint32)
+    for y in nb.prange(grid.shape[0]):
         span = 0
-        for x in range(cells.shape[1]):
-            if cells[y, x]:
+        for x in range(grid.shape[1]):
+            if grid[y, x]:
                 span += 1
             else:
                 span = 0
@@ -47,12 +38,12 @@ def horizontal_adjacency_right2left(cells):
 
 
 @nb.njit('uint32[:,::1](boolean[:,::1])', parallel=True, cache=True)
-def vertical_adjacency_bottom2top(cells):
-    result = np.zeros(cells.shape, dtype=np.uint32)
-    for x in nb.prange(cells.shape[1]):
+def vertical_adjacency_bottom2top(grid):
+    result = np.zeros(grid.shape, dtype=np.uint32)
+    for x in nb.prange(grid.shape[1]):
         span = 0
-        for y in range(cells.shape[0]):
-            if cells[y, x]:
+        for y in range(grid.shape[0]):
+            if grid[y, x]:
                 span += 1
             else:
                 span = 0
@@ -61,11 +52,11 @@ def vertical_adjacency_bottom2top(cells):
 
 
 @nb.njit(cache=True)
-def adjacencies_all_directions(cells):
-    h_left2right = horizontal_adjacency_left2right(cells)
-    h_right2left = horizontal_adjacency_right2left(cells)
-    v_top2bottom = vertical_adjacency_top2bottom(cells)
-    v_bottom2top = vertical_adjacency_bottom2top(cells)
+def adjacencies_all_directions(grid):
+    h_left2right = horizontal_adjacency_left2right(grid)
+    h_right2left = horizontal_adjacency_right2left(grid)
+    v_top2bottom = vertical_adjacency_top2bottom(grid)
+    v_bottom2top = vertical_adjacency_bottom2top(grid)
     return h_left2right, h_right2left, v_top2bottom, v_bottom2top
 
 
@@ -157,19 +148,17 @@ def get_xy_arrays(x, y, spans_all_directions):
 
 
 @nb.njit(cache=True)
-def point_on_outline(x, y, outline):
-    x_vals, y_vals = outline
-    x_true = x_vals == x
-    y_true = y_vals == y
+def cell_on_contour(x, y, contour):
+    x_true = contour[:, 0] == x
+    y_true = contour[:, 1] == y
     both_true = np.logical_and(x_true, y_true)
     return np.any(both_true)
 
 
 @nb.njit('Tuple((uint32[:,:,::1], uint8[:,::1], boolean[:,::1]))'
-         '(UniTuple(uint32[:], 2), UniTuple(uint32[:,::1], 4))',
+         '(UniTuple(uint32[:,::1], 4), uint32[:,::1])',
          parallel=True, cache=True)
-def create_maps(outline, adjacencies):
-    x_values, y_values = outline
+def create_maps(adjacencies, contour):
     h_left2right, h_right2left, v_top2bottom, v_bottom2top = adjacencies
 
     shape = h_left2right.shape
@@ -177,8 +166,8 @@ def create_maps(outline, adjacencies):
     direction_map = np.zeros(shape, "uint8")
     saddle_candidates_map = np.zeros(shape, "bool_")
 
-    for idx in nb.prange(len(x_values)):
-        x, y = x_values[idx], y_values[idx]
+    for idx in nb.prange(len(contour)):
+        x, y = contour[idx, 0], contour[idx, 1]
         h_vectors = h_vectors_all_directions(h_left2right, h_right2left, x, y)
         v_vectors = v_vectors_all_directions(v_top2bottom, v_bottom2top, x, y)
         span_arrays = spans_all_directions(h_vectors, v_vectors)
@@ -193,7 +182,7 @@ def create_maps(outline, adjacencies):
                 w, h = span_array[span_idx][0], span_array[span_idx][1]
                 if w*h > span_map[y, x, 0] * span_map[y, x, 1]:
                     span_map[y, x, :] = np.array([w, h], "uint32")
-                if n == 3 and not point_on_outline(x, y, outline):
+                if n == 3 and not cell_on_contour(x, y, contour):
                     saddle_candidates_map[y, x] = True
 
     return span_map, direction_map, saddle_candidates_map
