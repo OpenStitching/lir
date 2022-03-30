@@ -33,8 +33,8 @@ grid = np.array([[0, 0, 1, 0, 0, 0, 0, 0, 0],
 lir.lir(grid) # array([2, 2, 4, 7])
 ```
 
-For [significant performance enhancement](#contourlir) in larger grids specify the outline(s) of the polygons to consider.<br/>
-If the grid only has one polygon like in the example it can be obtained as so (with [opencv](https://pypi.org/project/opencv-python/)).
+For [significant performance enhancement](#contourlir) in larger grids specify the contours(s) of the polygons to consider.<br/>
+If the grid only has one polygon like in the example the contour can be obtained as so (with [opencv](https://pypi.org/project/opencv-python/)).
 
 ```python
 import cv2 as cv
@@ -74,7 +74,7 @@ Thanks also to [Mark Setchell](https://stackoverflow.com/users/2836621/mark-setc
 
 ## How it works
 
-For a cell grid:
+For a binary grid:
 
 <img width="200" src="https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/cells.png">
 
@@ -104,15 +104,15 @@ Widths             |  Heights             |  Areas
 
 ------------
 
-## <a name="contourlir">LIR based on outline</a>
+## <a name="contourlir">LIR based on contour</a>
 
-Especially for bigger grids the functionality can be further optimized by only analysing the outline. Here are timings created by calculating the lir for [masks in different resolutions](https://github.com/lukasalexanderweber/lir/tree/main/ext/performance_comparison):
+Especially for bigger grids the functionality can be further optimized by only analysing the outline of a polygon. Here are timings created by calculating the lir for [masks in different resolutions](https://github.com/lukasalexanderweber/lir/tree/main/ext/performance_comparison):
 
 Timings             |  Timings (log transformed)
 :-------------------------:|:-------------------------:
 <img width="400" src="https://github.com/lukasalexanderweber/lir/blob/main/ext/performance_comparison/performance_comparison.svg" /> |  <img width="400" src="https://github.com/lukasalexanderweber/lir/blob/main/ext/performance_comparison/performance_comparison_log.svg" />
 
-The computation costs are saved by analysing only the outline pixels instead of all cells. We utilize the fact that the LIR always touches the outline of the cell grid. Here is how it works:
+The computation costs are saved by analysing only the contour pixels instead of all cells. We utilize the fact that the LIR always touches the outline of the polygon. Here is how it works:
 
 <img width="200" src="https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/outline_approach/cells2.png">
 
