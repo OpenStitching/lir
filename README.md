@@ -1,7 +1,7 @@
 # lir
 Fast Largest Interior Rectangle calculation within a binary grid.
 
-<img height="75" src="https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/sample1.png" /> <img height="75" src="https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/sample2.png" /> <img height="75" src="https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/sample3.png" /> <img height="75" src="https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/sample5.png" />
+![sample1](./ext/readme_imgs/sample1.png)![sample2](./ext/readme_imgs/sample2.png)![sample3](./ext/readme_imgs/sample3.png)![sample4](./ext/readme_imgs/sample5.png)
 
 :rocket: Through [Numba](https://github.com/numba/numba) the Python code is compiled to machine code for execution at native machine code speed! 
 
@@ -33,7 +33,7 @@ grid = np.array([[0, 0, 1, 0, 0, 0, 0, 0, 0],
 lir.lir(grid) # array([2, 2, 4, 7])
 ```
 
-For [significant performance enhancement](#contourlir) in larger grids specify the contours(s) of the polygons to consider.<br/>
+For [significant performance enhancement](#contourlir) in larger grids specify the contours(s) of the polygons to consider.
 If the grid only has one polygon like in the example the contour can be obtained as so (with [opencv](https://pypi.org/project/opencv-python/)).
 
 ```python
@@ -76,19 +76,19 @@ Thanks also to [Mark Setchell](https://stackoverflow.com/users/2836621/mark-setc
 
 For a binary grid:
 
-<img width="200" src="https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/cells.png">
+![grid](./ext/readme_imgs/cells.png)
 
 We can specify for each cell how far one can go to the right and to the bottom:
 
 Horizontal Adjacency             |  Vertical Adjacency
 :-------------------------:|:-------------------------:
-<img width="300" src="https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/h_adjacency.png" /> |  <img width="300" src="https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/v_adjacency.png" />
+![h_adjacency](./ext/readme_imgs/h_adjacency.png) | ![v_adjacency](./ext/readme_imgs/v_adjacency.png)
 
 Now the goal is to find the possible rectangles for each cell. For that, we can specify a Horizontal Vector based on the Horizontal Adjacency and Vertical Vector based on the Vertical Adjacency:
 
 Horizontal Vector (2,2)             |  Vertical Vector (2,2)
 :-------------------------:|:-------------------------:
-<img width="300" src="https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/h_vector.png" /> |  <img width="300" src="https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/v_vector.png" />
+![h_vector](./ext/readme_imgs/h_vector.png) | ![h_vector](./ext/readme_imgs/h_vector.png)
 
 So at the given cell (2,2) the Horizontal Vector is (5,4) and the Vertical Vector is (7,4).
 
@@ -100,7 +100,7 @@ Using the area we can identify the biggest rectangle at (2, 2) with width 4 and 
 
 Widths             |  Heights             |  Areas
 :-------------------------:|:-------------------------:|:-------------------------:
-<img width="300" src="https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/span_map_widths.png" /> |  <img width="300" src="https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/span_map_heights.png" /> |  <img width="300" src="https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/span_map_areas.png" />
+![span_map_widths](./ext/readme_imgs/span_map_widths.png) | ![span_map_heights](./ext/readme_imgs/span_map_heights.png) | ![span_map_areas](./ext/readme_imgs/span_map_areas.png)
 
 ------------
 
@@ -110,7 +110,7 @@ Especially for bigger grids the functionality can be further optimized by only a
 
 Timings             |  Timings (log transformed)
 :-------------------------:|:-------------------------:
-<img width="400" src="https://github.com/lukasalexanderweber/lir/blob/main/ext/performance_comparison/performance_comparison.svg" /> |  <img width="400" src="https://github.com/lukasalexanderweber/lir/blob/main/ext/performance_comparison/performance_comparison_log.svg" />
+![performance_comparison](./ext/readme_imgs/performance_comparison.svg) | ![performance_comparison_log](./ext/readme_imgs/performance_comparison_log.svg)
 
 The computation costs are saved by analysing only the contour pixels instead of all cells. We utilize the fact that the LIR always touches the outline of the polygon. Here is how it works:
 
