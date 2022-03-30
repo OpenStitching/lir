@@ -1,11 +1,72 @@
 # lir
-Largest Interior Rectangle implementation in Python. 
+Fast Largest Interior Rectangle calculation within a binary grid.
 
-<img height="75" src="https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/sample1.png" /> <img height="75" src="https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/sample2.png" /> <img height="75" src="https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/sample3.png" /> <img height="75" src="https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/sample4.png" /> <img height="75" src="https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/sample5.png" />
+<img height="75" src="https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/sample1.png" /> <img height="75" src="https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/sample2.png" /> <img height="75" src="https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/sample3.png" /> <img height="75" src="https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/sample5.png" />
 
 :rocket: Through [Numba](https://github.com/numba/numba) the Python code is compiled to machine code for execution at native machine code speed! 
 
-### Acknowledgements
+## Installation
+
+Use the package manager [pip](https://pip.pypa.io/en/stable/) to install largestinteriorrectangle.
+
+```bash
+pip install largestinteriorrectangle
+```
+
+## Usage
+
+```python
+import largestinteriorrectangle as lir
+import numpy as np
+
+grid = np.array([[0, 0, 1, 0, 0, 0, 0, 0, 0],
+                 [0, 0, 1, 0, 1, 1, 0, 0, 0],
+                 [0, 0, 1, 1, 1, 1, 1, 0, 0],
+                 [0, 0, 1, 1, 1, 1, 1, 1, 0],
+                 [0, 0, 1, 1, 1, 1, 1, 1, 0],
+                 [0, 1, 1, 1, 1, 1, 1, 0, 0],
+                 [0, 0, 1, 1, 1, 1, 0, 0, 0],
+                 [0, 0, 1, 1, 1, 1, 0, 0, 0],
+                 [1, 1, 1, 1, 1, 1, 0, 0, 0],
+                 [1, 1, 0, 0, 0, 1, 1, 1, 1],
+                 [0, 0, 0, 0, 0, 0, 0, 0, 0]],
+                "bool")
+
+rect = lir.lir(grid) # array([2, 2, 4, 7])
+```
+
+For [significant performance enhancement](#contourlir) in larger grids specify the outline(s) of the polygons to consider.<br/>
+If the grid only has one polygon like in the example it can be obtained as so (with [opencv](https://pypi.org/project/opencv-python/)).
+
+```python
+import cv2 as cv
+cv_grid = grid.astype("uint8") * 255
+contours, _ = \
+    cv.findContours(cv_grid, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
+contour = contours[0][:, 0, :]
+```
+
+then calculate the rectangle.
+
+```python
+rect = lir.lir(grid, contour) # array([2, 2, 4, 7])
+```
+
+## Contributing
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+Please make sure to update tests as appropriate.
+
+Run tests using 
+
+```bash
+python -m unittest
+```
+
+## License
+[Apache License 2.0](https://github.com/lukasalexanderweber/lir/blob/main/LICENSE)
+
+## Acknowledgements
 
 Thanks to [Tim Swan](https://www.linkedin.com/in/tim-swan-14b1b/) for making his Largest Interior Rectangle implementation in C# [open source](https://github.com/Evryway/lir) and did a great [blog post](https://www.evryway.com/largest-interior/) about it. The first part was mainly reimplementing his solution in Python.
 
@@ -13,7 +74,7 @@ The used Algorithm was described 2019 in [Algorithm for finding the largest insc
 
 Thanks also to [Mark Setchell](https://stackoverflow.com/users/2836621/mark-setchell) and [joni](https://stackoverflow.com/users/4745529/joni) who greatly helped optimizing the performance using cpython/numba in [this SO querstion](https://stackoverflow.com/questions/69854335/optimize-the-calculation-of-horizontal-and-vertical-adjacency-using-numpy)
 
-### How it works
+## How it works
 
 For a cell grid:
 
@@ -45,7 +106,7 @@ Widths             |  Heights             |  Areas
 
 ------------
 
-### LIR based on outline
+## <a name="contourlir">LIR based on outline</a>
 
 Especially for bigger grids the functionality can be further optimized by only analysing the outline. Here are timings created by calculating the lir for [masks in different resolutions](https://github.com/lukasalexanderweber/lir/tree/main/ext/performance_comparison):
 
