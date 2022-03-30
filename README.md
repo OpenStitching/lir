@@ -7,8 +7,6 @@ Fast Largest Interior Rectangle calculation within a binary grid.
 
 ## Installation
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install largestinteriorrectangle.
-
 ```bash
 pip install largestinteriorrectangle
 ```
@@ -32,7 +30,7 @@ grid = np.array([[0, 0, 1, 0, 0, 0, 0, 0, 0],
                  [0, 0, 0, 0, 0, 0, 0, 0, 0]],
                 "bool")
 
-rect = lir.lir(grid) # array([2, 2, 4, 7])
+lir.lir(grid) # array([2, 2, 4, 7])
 ```
 
 For [significant performance enhancement](#contourlir) in larger grids specify the outline(s) of the polygons to consider.<br/>
@@ -49,7 +47,7 @@ contour = contours[0][:, 0, :]
 then calculate the rectangle.
 
 ```python
-rect = lir.lir(grid, contour) # array([2, 2, 4, 7])
+lir.lir(grid, contour) # array([2, 2, 4, 7])
 ```
 
 ## Contributing
