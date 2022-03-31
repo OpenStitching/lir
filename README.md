@@ -114,21 +114,21 @@ Timings             |  Timings (log transformed)
 
 The computation costs are saved by analysing only the contour pixels instead of all cells. We utilize the fact that the LIR always touches the outline of the polygon. Here is how it works:
 
-<img width="200" src="https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/outline_approach/cells2.png">
+![grid](./ext/readme_imgs/outline_approach/cells2.png)
 
 An outline cell can span into one (blue), two (green) or three (red) directions (up, down, left, right):
 
-<img width="200" src="https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/outline_approach/direction_map.png">
+![direction_map](./ext/readme_imgs/outline_approach/direction_map.png)
 
 By calculating the spans in all possible directions we can obtain a span map:
 
 Widths             |  Heights             |  Areas
 :-------------------------:|:-------------------------:|:-------------------------:
-<img width="300" src="https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/outline_approach/span_map_widths.png" /> |  <img width="300" src="https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/outline_approach/span_map_heights.png" /> |  <img width="300" src="https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/outline_approach/span_map_areas.png" />
+![span_map_widths](./ext/readme_imgs/outline_approach/span_map_widths.png) | ![span_map_heights](./ext/readme_imgs/outline_approach/span_map_heights.png) | ![span_map_areas](./ext/readme_imgs/outline_approach/span_map_areas.png)
 
 To analyse what happens here we'll have a closer look at cell (4,2). 
 
-<img width="200" src="https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/outline_approach/direction_map_cell_2_2.png">
+![direction_map_cell_2_2](./ext/readme_imgs/outline_approach/direction_map_cell_2_2.png)
 
 It can span into 3 directions: left, down and right. Going to left and down the maximum span is (3 by 7). The final spans are noted in left2right and top2bottom notation. In this case, however, the width is calculated from right2left. We can transform it with the simple formula `x = cell_x - span_width + 1`, in this case `4 - 3 + 1 = 2`. Since the height is already calculated from top2bottom y doesn't change and the span (3 by 7) is allocated to cell (2,2) (black dotted).
 
@@ -138,10 +138,10 @@ So for "candidate cells" like (2,2) which do not lie on the outline and come fro
 
 <sup>1</sup> TODO cell (1,6) has the same area, there is no feedback to the user if multiple LIRs exist
 
-<img width="200" src="https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/outline_approach/candidate_map.png">
+![candidate_map](./ext/readme_imgs/outline_approach/candidate_map.png)
 
 Widths             |  Heights             |  Areas
 :-------------------------:|:-------------------------:|:-------------------------:
-<img width="300" src="https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/outline_approach/span_map2_widths.png" /> |  <img width="300" src="https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/outline_approach/span_map2_heights.png" /> |  <img width="300" src="https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/outline_approach/span_map2_areas.png" />
+![span_map2_widths](./ext/readme_imgs/outline_approach/span_map2_widths.png) | ![span_map2_heights](./ext/readme_imgs/outline_approach/span_map2_heights.png) | ![span_map2_areas](./ext/readme_imgs/outline_approach/span_map2_areas.png)
 
 The biggest span of the two span maps are compared and the bigger one returned as lir, in this case cell (2,2) with a span (4 by 7)
