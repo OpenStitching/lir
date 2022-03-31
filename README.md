@@ -1,9 +1,10 @@
 # lir
+
 Fast Largest Interior Rectangle calculation within a binary grid.
 
 ![sample1](./ext/readme_imgs/sample1.png)![sample2](./ext/readme_imgs/sample2.png)![sample3](./ext/readme_imgs/sample3.png)![sample4](./ext/readme_imgs/sample5.png)
 
-:rocket: Through [Numba](https://github.com/numba/numba) the Python code is compiled to machine code for execution at native machine code speed! 
+:rocket: Through [Numba](https://github.com/numba/numba) the Python code is compiled to machine code for execution at native machine code speed!
 
 ## Installation
 
@@ -33,7 +34,7 @@ grid = np.array([[0, 0, 1, 0, 0, 0, 0, 0, 0],
 lir.lir(grid) # array([2, 2, 4, 7])
 ```
 
-For [significant performance enhancement](#contourlir) in larger grids specify the contours(s) of the polygons to consider.
+For [significant performance enhancement](#lir-based-on-contour) in larger grids specify the contours(s) of the polygons to consider.
 If the grid only has one polygon like in the example the contour can be obtained as so (with [opencv](https://pypi.org/project/opencv-python/)).
 
 ```python
@@ -51,17 +52,19 @@ lir.lir(grid, contour) # array([2, 2, 4, 7])
 ```
 
 ## Contributing
+
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 Please make sure to update tests as appropriate.
 
-Run tests using 
+Run tests using
 
 ```bash
 python -m unittest
 ```
 
 ## License
+
 [Apache License 2.0](https://github.com/lukasalexanderweber/lir/blob/main/LICENSE)
 
 ## Acknowledgements
@@ -96,7 +99,7 @@ Reversing either vector lets you create the spans by stacking the vectors, so fo
 
 Since `4*7=28 > 5*4=20` a rectangle with width 4 and height 7 is the biggest possible rectangle for cell (2,2).
 The width and height is stored in a span map, where the widths and heights of the maximum rectangles are stored for all cells.
-Using the area we can identify the biggest rectangle at (2, 2) with width 4 and height 7. 
+Using the area we can identify the biggest rectangle at (2, 2) with width 4 and height 7.
 
 Widths             |  Heights             |  Areas
 :-------------------------:|:-------------------------:|:-------------------------:
@@ -104,7 +107,7 @@ Widths             |  Heights             |  Areas
 
 ------------
 
-## <a name="contourlir">LIR based on contour</a>
+## LIR based on contour
 
 Especially for bigger grids the functionality can be further optimized by only analysing the outline of a polygon. Here are timings created by calculating the lir for [masks in different resolutions](https://github.com/lukasalexanderweber/lir/tree/main/ext/performance_comparison):
 
@@ -126,17 +129,15 @@ Widths             |  Heights             |  Areas
 :-------------------------:|:-------------------------:|:-------------------------:
 ![span_map_widths](./ext/readme_imgs/outline_approach/span_map_widths.png) | ![span_map_heights](./ext/readme_imgs/outline_approach/span_map_heights.png) | ![span_map_areas](./ext/readme_imgs/outline_approach/span_map_areas.png)
 
-To analyse what happens here we'll have a closer look at cell (4,2). 
+To analyse what happens here we'll have a closer look at cell (4,2).
 
 ![direction_map_cell_2_2](./ext/readme_imgs/outline_approach/direction_map_cell_2_2.png)
 
 It can span into 3 directions: left, down and right. Going to left and down the maximum span is (3 by 7). The final spans are noted in left2right and top2bottom notation. In this case, however, the width is calculated from right2left. We can transform it with the simple formula `x = cell_x - span_width + 1`, in this case `4 - 3 + 1 = 2`. Since the height is already calculated from top2bottom y doesn't change and the span (3 by 7) is allocated to cell (2,2) (black dotted).
 
-(2,2) is the cell with the biggest area in the span map<sup>1</sup>. However, the information that the rectangle can be expanded to the right (turquoise dotted) is missing. 
+(2,2) is (besides (1,6)) the cell with the biggest area in the span map. However, the information that the rectangle can be expanded to the right (turquoise dotted) is missing.
 
 So for "candidate cells" like (2,2) which do not lie on the outline and come from outline cells going in 3 directions, we create a new span map (using left2right and top2bottom adjacencies):
-
-<sup>1</sup> TODO cell (1,6) has the same area, there is no feedback to the user if multiple LIRs exist
 
 ![candidate_map](./ext/readme_imgs/outline_approach/candidate_map.png)
 
