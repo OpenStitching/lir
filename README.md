@@ -113,7 +113,7 @@ Especially for bigger grids the functionality can be further optimized by only a
 
 Timings             |  Timings (log transformed)
 :-------------------------:|:-------------------------:
-![performance_comparison](./ext/readme_imgs/performance_comparison.svg) | ![performance_comparison_log](./ext/readme_imgs/performance_comparison_log.svg)
+![performance_comparison](./ext/readme_imgs/performance_comparison.png) | ![performance_comparison_log](./ext/readme_imgs/performance_comparison_log.png)
 
 The computation costs are saved by analysing only the contour pixels instead of all cells. We utilize the fact that the LIR always touches the outline of the polygon. Here is how it works:
 
