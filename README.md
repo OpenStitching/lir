@@ -2,7 +2,7 @@
 
 Fast Largest Interior Rectangle calculation within a binary grid.
 
-![sample1](./ext/readme_imgs/sample1.png) ![sample2](./ext/readme_imgs/sample2.png) ![sample4](./ext/readme_imgs/sample5.png)
+![sample1](https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/sample1.png?raw=true) ![sample2](https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/sample2.png?raw=true) ![sample4](https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/sample5.png?raw=true)
 
 :rocket: Through [Numba](https://github.com/numba/numba) the Python code is compiled to machine code for execution at native machine code speed!
 
@@ -79,19 +79,19 @@ Thanks also to [Mark Setchell](https://stackoverflow.com/users/2836621/mark-setc
 
 For a binary grid:
 
-![grid](./ext/readme_imgs/cells.png)
+![grid](https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/cells.png?raw=true)
 
 We can specify for each cell how far one can go to the right and to the bottom:
 
 Horizontal Adjacency             |  Vertical Adjacency
 :-------------------------:|:-------------------------:
-![h_adjacency](./ext/readme_imgs/h_adjacency.png) | ![v_adjacency](./ext/readme_imgs/v_adjacency.png)
+![h_adjacency](https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/h_adjacency.png?raw=true) | ![v_adjacency](https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/v_adjacency.png?raw=true)
 
 Now the goal is to find the possible rectangles for each cell. For that, we can specify a Horizontal Vector based on the Horizontal Adjacency and Vertical Vector based on the Vertical Adjacency:
 
 Horizontal Vector (2,2)             |  Vertical Vector (2,2)
 :-------------------------:|:-------------------------:
-![h_vector](./ext/readme_imgs/h_vector.png) | ![h_vector](./ext/readme_imgs/h_vector.png)
+![h_vector](https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/h_vector.png?raw=true) | ![h_vector](https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/h_vector.png?raw=true)
 
 So at the given cell (2,2) the Horizontal Vector is (5,4) and the Vertical Vector is (7,4).
 
@@ -103,7 +103,7 @@ Using the area we can identify the biggest rectangle at (2, 2) with width 4 and 
 
 Widths             |  Heights             |  Areas
 :-------------------------:|:-------------------------:|:-------------------------:
-![span_map_widths](./ext/readme_imgs/span_map_widths.png) | ![span_map_heights](./ext/readme_imgs/span_map_heights.png) | ![span_map_areas](./ext/readme_imgs/span_map_areas.png)
+![span_map_widths](https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/span_map_widths.png?raw=true) | ![span_map_heights](https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/span_map_heights.png?raw=true) | ![span_map_areas](https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/span_map_areas.png?raw=true)
 
 ------------
 
@@ -113,25 +113,25 @@ Especially for bigger grids the functionality can be further optimized by only a
 
 Timings             |  Timings (log transformed)
 :-------------------------:|:-------------------------:
-![performance_comparison](./ext/performance_comparison/performance_comparison.png) | ![performance_comparison_log](./ext/performance_comparison/performance_comparison_log.png)
+![performance_comparison](https://github.com/lukasalexanderweber/lir/blob/main/ext/performance_comparison/performance_comparison.png?raw=true) | ![performance_comparison_log](https://github.com/lukasalexanderweber/lir/blob/main/ext/performance_comparison/performance_comparison_log.png?raw=true)
 
 The computation costs are saved by analysing only the contour pixels instead of all cells. We utilize the fact that the LIR always touches the outline of the polygon. Here is how it works:
 
-![grid](./ext/readme_imgs/outline_approach/cells2.png)
+![grid](https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/outline_approach/cells2.png?raw=true)
 
 An outline cell can span into one (blue), two (green) or three (red) directions (up, down, left, right):
 
-![direction_map](./ext/readme_imgs/outline_approach/direction_map.png)
+![direction_map](https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/outline_approach/direction_map.png?raw=true)
 
 By calculating the spans in all possible directions we can obtain a span map:
 
 Widths             |  Heights             |  Areas
 :-------------------------:|:-------------------------:|:-------------------------:
-![span_map_widths](./ext/readme_imgs/outline_approach/span_map_widths.png) | ![span_map_heights](./ext/readme_imgs/outline_approach/span_map_heights.png) | ![span_map_areas](./ext/readme_imgs/outline_approach/span_map_areas.png)
+![span_map_widths](https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/outline_approach/span_map_widths.png?raw=true) | ![span_map_heights](https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/outline_approach/span_map_heights.png?raw=true) | ![span_map_areas](https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/outline_approach/span_map_areas.png?raw=true)
 
 To analyse what happens here we'll have a closer look at cell (4,2).
 
-![direction_map_cell_2_2](./ext/readme_imgs/outline_approach/direction_map_cell_2_2.png)
+![direction_map_cell_2_2](https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/outline_approach/direction_map_cell_2_2.png?raw=true)
 
 It can span into 3 directions: left, down and right. Going to left and down the maximum span is (3 by 7). The final spans are noted in left2right and top2bottom notation. In this case, however, the width is calculated from right2left. We can transform it with the simple formula `x = cell_x - span_width + 1`, in this case `4 - 3 + 1 = 2`. Since the height is already calculated from top2bottom y doesn't change and the span (3 by 7) is allocated to cell (2,2) (black dotted).
 
@@ -139,10 +139,10 @@ It can span into 3 directions: left, down and right. Going to left and down the 
 
 So for "candidate cells" like (2,2) which do not lie on the outline and come from outline cells going in 3 directions, we create a new span map (using left2right and top2bottom adjacencies):
 
-![candidate_map](./ext/readme_imgs/outline_approach/candidate_map.png)
+![candidate_map](https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/outline_approach/candidate_map.png?raw=true)
 
 Widths             |  Heights             |  Areas
 :-------------------------:|:-------------------------:|:-------------------------:
-![span_map2_widths](./ext/readme_imgs/outline_approach/span_map2_widths.png) | ![span_map2_heights](./ext/readme_imgs/outline_approach/span_map2_heights.png) | ![span_map2_areas](./ext/readme_imgs/outline_approach/span_map2_areas.png)
+![span_map2_widths](https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/outline_approach/span_map2_widths.png?raw=true) | ![span_map2_heights](https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/outline_approach/span_map2_heights.png?raw=true) | ![span_map2_areas](https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/outline_approach/span_map2_areas.png?raw=true)
 
 The biggest span of the two span maps are compared and the bigger one returned as lir, in this case cell (2,2) with a span (4 by 7)
