@@ -8,7 +8,7 @@ Fast Largest Interior Rectangle calculation within a binary grid.
 
 ## Installation
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install largestinteriorrectangle.
+Use pip to install largestinteriorrectangle from [PyPI](https://pypi.org/project/largestinteriorrectangle/).
 
 ```bash
 pip install largestinteriorrectangle
