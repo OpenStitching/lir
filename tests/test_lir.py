@@ -4,7 +4,7 @@ import os
 import numpy as np
 import cv2 as cv
 
-from .context import lir
+from .context import lir_basis as lir
 
 TEST_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -13,39 +13,39 @@ class TestLIR(unittest.TestCase):
 
     def test_lir(self):
 
-        cells = np.array([[0, 0, 1, 0, 0, 0, 0, 0, 0],
-                          [0, 0, 1, 0, 1, 1, 0, 0, 0],
-                          [0, 0, 1, 1, 1, 1, 1, 0, 0],
-                          [0, 0, 1, 1, 1, 1, 1, 1, 0],
-                          [0, 0, 1, 1, 1, 1, 1, 1, 0],
-                          [0, 1, 1, 1, 1, 1, 1, 0, 0],
-                          [0, 0, 1, 1, 1, 1, 0, 0, 0],
-                          [0, 0, 1, 1, 1, 1, 0, 0, 0],
-                          [1, 1, 1, 1, 1, 1, 0, 0, 0],
-                          [1, 1, 0, 0, 0, 1, 1, 1, 1],
-                          [0, 0, 0, 0, 0, 0, 0, 0, 0]])
-        cells = cells > 0
+        grid = np.array([[0, 0, 1, 0, 0, 0, 0, 0, 0],
+                         [0, 0, 1, 0, 1, 1, 0, 0, 0],
+                         [0, 0, 1, 1, 1, 1, 1, 0, 0],
+                         [0, 0, 1, 1, 1, 1, 1, 1, 0],
+                         [0, 0, 1, 1, 1, 1, 1, 1, 0],
+                         [0, 1, 1, 1, 1, 1, 1, 0, 0],
+                         [0, 0, 1, 1, 1, 1, 0, 0, 0],
+                         [0, 0, 1, 1, 1, 1, 0, 0, 0],
+                         [1, 1, 1, 1, 1, 1, 0, 0, 0],
+                         [1, 1, 0, 0, 0, 1, 1, 1, 1],
+                         [0, 0, 0, 0, 0, 0, 0, 0, 0]])
+        grid = grid > 0
 
-        h = lir.horizontal_adjacency(cells)
-        v = lir.vertical_adjacency(cells)
-        span_map = lir.span_map(cells, h, v)
+        h = lir.horizontal_adjacency(grid)
+        v = lir.vertical_adjacency(grid)
+        span_map = lir.span_map(grid, h, v)
         rect = lir.biggest_span_in_span_map(span_map)
-        rect2 = lir.largest_interior_rectangle(cells)
+        rect2 = lir.largest_interior_rectangle(grid)
 
         np.testing.assert_array_equal(rect, np.array([2, 2, 4, 7]))
         np.testing.assert_array_equal(rect, rect2)
 
     def test_spans(self):
-        cells = np.array([[1, 1, 1],
-                          [1, 1, 0],
-                          [1, 0, 0],
-                          [1, 0, 0],
-                          [1, 0, 0],
-                          [1, 1, 1]])
-        cells = cells > 0
+        grid = np.array([[1, 1, 1],
+                         [1, 1, 0],
+                         [1, 0, 0],
+                         [1, 0, 0],
+                         [1, 0, 0],
+                         [1, 1, 1]])
+        grid = grid > 0
 
-        h = lir.horizontal_adjacency(cells)
-        v = lir.vertical_adjacency(cells)
+        h = lir.horizontal_adjacency(grid)
+        v = lir.vertical_adjacency(grid)
         v_vector = lir.v_vector(v, 0, 0)
         h_vector = lir.h_vector(h, 0, 0)
         spans = lir.spans(h_vector, v_vector)
@@ -72,9 +72,9 @@ class TestLIR(unittest.TestCase):
         self.assertEqual(lir.predict_vector_size(t5), 0)
 
     def test_img(self):
-        cells = cv.imread(os.path.join(TEST_DIR, "testdata", "mask.png"), 0)
-        cells = cells > 0
-        rect = lir.largest_interior_rectangle(cells)
+        grid = cv.imread(os.path.join(TEST_DIR, "testdata", "mask.png"), 0)
+        grid = grid > 0
+        rect = lir.largest_interior_rectangle(grid)
         np.testing.assert_array_equal(rect, np.array([4, 20, 834, 213]))
 
 
@@ -84,76 +84,3 @@ def starttest():
 
 if __name__ == "__main__":
     starttest()
-
-
-# README PLOTS
-
-# from matplotlib import pyplot as plt
-
-# data = np.flip(cells, 0)
-
-# # The normal figure
-# fig = plt.figure(figsize=(16, 12))
-# ax = fig.add_subplot(111)
-# ax.axes.xaxis.set_visible(False)
-# ax.axes.yaxis.set_visible(False)
-# im = ax.imshow(data, origin='lower', interpolation='None', cmap='Greys_r')
-# fig.colorbar(im)
-
-# data = np.flip(h, 0)
-
-# # The normal figure
-# fig = plt.figure(figsize=(16, 12))
-# ax = fig.add_subplot(111)
-# ax.axes.xaxis.set_visible(False)
-# ax.axes.yaxis.set_visible(False)
-# im = ax.imshow(data, origin='lower', interpolation='None', cmap='viridis')
-# fig.colorbar(im)
-
-# data = np.flip(v, 0)
-
-# # The normal figure
-# fig = plt.figure(figsize=(16, 12))
-# ax = fig.add_subplot(111)
-# ax.axes.xaxis.set_visible(False)
-# ax.axes.yaxis.set_visible(False)
-# im = ax.imshow(data, origin='lower', interpolation='None', cmap='viridis')
-# fig.colorbar(im)
-
-# data = np.flip(v*h, 0)
-
-# h_vec = lir.h_vector(h, 2, 2)
-# v_vec = lir.v_vector(v, 2, 2)
-# spans = lir.spans(h_vec, v_vec)
-
-# data = np.flip(span_map[:, :, 0], 0)
-
-# # The normal figure
-# fig = plt.figure(figsize=(16, 12))
-# ax = fig.add_subplot(111)
-# ax.axes.xaxis.set_visible(False)
-# ax.axes.yaxis.set_visible(False)
-# im = ax.imshow(data, origin='lower', interpolation='None', cmap='viridis')
-# fig.colorbar(im)
-
-
-# data = np.flip(span_map[:, :, 1], 0)
-
-# # The normal figure
-# fig = plt.figure(figsize=(16, 12))
-# ax = fig.add_subplot(111)
-# ax.axes.xaxis.set_visible(False)
-# ax.axes.yaxis.set_visible(False)
-# im = ax.imshow(data, origin='lower', interpolation='None', cmap='viridis')
-# fig.colorbar(im)
-
-
-# data = np.flip(span_map[:, :, 0] * span_map[:, :, 1], 0)
-
-# # The normal figure
-# fig = plt.figure(figsize=(16, 12))
-# ax = fig.add_subplot(111)
-# ax.axes.xaxis.set_visible(False)
-# ax.axes.yaxis.set_visible(False)
-# im = ax.imshow(data, origin='lower', interpolation='None', cmap='viridis')
-# fig.colorbar(im)
