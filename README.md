@@ -99,7 +99,7 @@ Now the goal is to find the possible rectangles for each cell. For that, we can 
 
 Horizontal Vector (2,2)             |  Vertical Vector (2,2)
 :-------------------------:|:-------------------------:
-![h_vector](https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/h_vector.png?raw=true) | ![h_vector](https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/h_vector.png?raw=true)
+![h_vector](https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/h_vector.png?raw=true) | ![h_vector](https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/v_vector.png?raw=true)
 
 So at the given cell (2,2) the Horizontal Vector is (5,4) and the Vertical Vector is (7,4).
 
