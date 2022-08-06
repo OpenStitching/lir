@@ -65,12 +65,6 @@ Run tests using
 python -m unittest
 ```
 
-Build with
-
-```bash
-python -m build
-```
-
 ## License
 
 [Apache License 2.0](https://github.com/lukasalexanderweber/lir/blob/main/LICENSE)
