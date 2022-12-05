@@ -2,81 +2,86 @@ import unittest
 import os
 
 import numpy as np
-import cv2 as cv
 
-from .context import lir_basis as lir
+from .context import lir, pt1, pt2
 
 TEST_DIR = os.path.abspath(os.path.dirname(__file__))
+
+GRID = np.array([[0, 0, 1, 0, 0, 0, 0, 0, 0],
+                 [0, 0, 1, 0, 1, 1, 0, 0, 0],
+                 [0, 0, 1, 1, 1, 1, 1, 0, 0],
+                 [0, 0, 1, 1, 1, 1, 1, 1, 0],
+                 [0, 0, 1, 1, 1, 1, 1, 1, 0],
+                 [0, 1, 1, 1, 1, 1, 1, 0, 0],
+                 [0, 0, 1, 1, 1, 1, 0, 0, 0],
+                 [0, 0, 1, 1, 1, 1, 0, 0, 0],
+                 [1, 1, 1, 1, 1, 1, 0, 0, 0],
+                 [1, 1, 0, 0, 0, 1, 1, 1, 1],
+                 [0, 0, 0, 0, 0, 0, 0, 0, 0]], "bool")
 
 
 class TestLIR(unittest.TestCase):
 
-    def test_lir(self):
+    def test_lir_polygon(self):
+        polygon = np.array([[
+            [10,10],
+            [150,10],
+            [100,100],
+            [-40,100]]
+            ], dtype=np.int32 )
 
-        grid = np.array([[0, 0, 1, 0, 0, 0, 0, 0, 0],
-                         [0, 0, 1, 0, 1, 1, 0, 0, 0],
-                         [0, 0, 1, 1, 1, 1, 1, 0, 0],
-                         [0, 0, 1, 1, 1, 1, 1, 1, 0],
-                         [0, 0, 1, 1, 1, 1, 1, 1, 0],
-                         [0, 1, 1, 1, 1, 1, 1, 0, 0],
-                         [0, 0, 1, 1, 1, 1, 0, 0, 0],
-                         [0, 0, 1, 1, 1, 1, 0, 0, 0],
-                         [1, 1, 1, 1, 1, 1, 0, 0, 0],
-                         [1, 1, 0, 0, 0, 1, 1, 1, 1],
-                         [0, 0, 0, 0, 0, 0, 0, 0, 0]])
-        grid = grid > 0
+        rect = lir(polygon)
+        np.testing.assert_array_equal(rect, np.array([10, 10, 91, 91]))
 
-        h = lir.horizontal_adjacency(grid)
-        v = lir.vertical_adjacency(grid)
-        span_map = lir.span_map(grid, h, v)
-        rect = lir.biggest_span_in_span_map(span_map)
-        rect2 = lir.largest_interior_rectangle(grid)
 
+    def test_lir_binary_mask(self):
+        
+        rect = lir(GRID)
         np.testing.assert_array_equal(rect, np.array([2, 2, 4, 7]))
-        np.testing.assert_array_equal(rect, rect2)
+        
+    def test_lir_binary_mask_with_contour(self):
+        contour = np.array([[2, 0],
+               [2, 1],
+               [2, 2],
+               [2, 3],
+               [2, 4],
+               [1, 5],
+               [2, 6],
+               [2, 7],
+               [1, 8],
+               [0, 8],
+               [0, 9],
+               [1, 9],
+               [2, 8],
+               [3, 8],
+               [4, 8],
+               [5, 9],
+               [6, 9],
+               [7, 9],
+               [8, 9],
+               [7, 9],
+               [6, 9],
+               [5, 8],
+               [5, 7],
+               [5, 6],
+               [6, 5],
+               [7, 4],
+               [7, 3],
+               [6, 2],
+               [5, 1],
+               [4, 1],
+               [3, 2],
+               [2, 1]], dtype=np.int32)
 
-    def test_spans(self):
-        grid = np.array([[1, 1, 1],
-                         [1, 1, 0],
-                         [1, 0, 0],
-                         [1, 0, 0],
-                         [1, 0, 0],
-                         [1, 1, 1]])
-        grid = grid > 0
 
-        h = lir.horizontal_adjacency(grid)
-        v = lir.vertical_adjacency(grid)
-        v_vector = lir.v_vector(v, 0, 0)
-        h_vector = lir.h_vector(h, 0, 0)
-        spans = lir.spans(h_vector, v_vector)
+        rect = lir(GRID, contour)
+        np.testing.assert_array_equal(rect, np.array([2, 2, 4, 7]))
 
-        np.testing.assert_array_equal(v_vector, np.array([6, 2, 1]))
-        np.testing.assert_array_equal(h_vector, np.array([3, 2, 1]))
-        np.testing.assert_array_equal(spans, np.array([[3, 1],
-                                                       [2, 2],
-                                                       [1, 6]]))
-
-    def test_vector_size(self):
-        t0 = np.array([1, 1, 1, 1], dtype=np.uint32)
-        t1 = np.array([1, 1, 1, 0], dtype=np.uint32)
-        t2 = np.array([1, 1, 0, 1, 1, 0], dtype=np.uint32)
-        t3 = np.array([0, 0, 0, 0], dtype=np.uint32)
-        t4 = np.array([0, 1, 1, 1], dtype=np.uint32)
-        t5 = np.array([], dtype=np.uint32)
-
-        self.assertEqual(lir.predict_vector_size(t0), 4)
-        self.assertEqual(lir.predict_vector_size(t1), 3)
-        self.assertEqual(lir.predict_vector_size(t2), 2)
-        self.assertEqual(lir.predict_vector_size(t3), 0)
-        self.assertEqual(lir.predict_vector_size(t4), 0)
-        self.assertEqual(lir.predict_vector_size(t5), 0)
-
-    def test_img(self):
-        grid = cv.imread(os.path.join(TEST_DIR, "testdata", "mask.png"), 0)
-        grid = grid > 0
-        rect = lir.largest_interior_rectangle(grid)
-        np.testing.assert_array_equal(rect, np.array([4, 20, 834, 213]))
-
+    def test_rectangle_pts(self):
+        rect = np.array([10, 10, 91, 91])
+        self.assertEqual(pt1(rect), (10, 10))
+        self.assertEqual(pt2(rect), (100, 100))
+    
 
 def starttest():
     unittest.main()
