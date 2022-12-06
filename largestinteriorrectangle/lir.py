@@ -9,9 +9,9 @@ def lir(data, contour=None):
     """
     Computes the Largest Interior Rectangle.
     :param data: Can be
-        1. a 3D ndarray with shape (1, n, 2) with integer xy coordinates of a polygon in which the lir should be found
-        2. a 2D ndarray with shape (n, m) of type boolean. The lir is found within all True cells
-    :param contour: (optional) 2D ndarray with shape (n, 2) containing xy values of a specific contour where the rectangle could start (in all directions). Only needed for case 2.
+        1. a 2D ndarray with shape (n, m) of type boolean. The lir is found within all True cells
+        2. a 3D ndarray with shape (1, n, 2) with integer xy coordinates of a polygon in which the lir should be found
+    :param contour: (optional) 2D ndarray with shape (n, 2) containing xy values of a specific contour where the rectangle could start (in all directions). Only needed for case 1.
     :return: 1D ndarray with lir specification: x, y, width, height
     :rtype: ndarray
     """

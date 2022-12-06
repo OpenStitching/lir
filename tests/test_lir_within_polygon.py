@@ -11,6 +11,20 @@ TEST_DIR = os.path.abspath(os.path.dirname(__file__))
 
 class TestLIRwithinPolygon(unittest.TestCase):
     
+    def test_create_mask_from_polygon(self):
+        polygon = np.array([[
+            [10,10],
+            [150,10],
+            [100,100],
+            [-40,100]]
+            ], dtype=np.int32)
+        
+        origin, mask = lir.create_mask_from_polygon(polygon)
+        
+        self.assertEqual(origin, (-40, 10))
+        self.assertEqual(mask.shape, (91, 191))
+        self.assertEqual(np.count_nonzero(mask == 255), 12831)
+            
     def test_polygon(self):
         polygon = np.array([[
             [10,10],
