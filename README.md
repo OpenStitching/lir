@@ -53,6 +53,8 @@ then calculate the rectangle.
 lir.lir(grid, contour) # array([2, 2, 4, 7])
 ```
 
+You can also calculate the lir from a list of polygon points. See my answer in [this SO question](https://stackoverflow.com/questions/70362355/finding-largest-inscribed-rectangle-in-polygon) for that.
+
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
