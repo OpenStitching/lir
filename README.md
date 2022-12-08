@@ -2,7 +2,7 @@
 
 Fast Largest Interior Rectangle calculation within a binary grid.
 
-![sample1](https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/sample1.png?raw=true) ![sample2](https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/sample2.png?raw=true) ![sample4](https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/sample5.png?raw=true)
+![sample1](https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/sample1.png?raw=true)
 
 :rocket: Through [Numba](https://github.com/numba/numba) the Python code is compiled to machine code for execution at native machine code speed!
 
