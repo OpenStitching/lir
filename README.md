@@ -2,7 +2,7 @@
 
 Fast Largest Interior Rectangle calculation within a binary grid.
 
-![sample1](https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/sample1.png?raw=true) ![sample2](https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/sample2.png?raw=true) ![sample4](https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/sample5.png?raw=true)
+![sample1](https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/sample1.png?raw=true)
 
 :rocket: Through [Numba](https://github.com/numba/numba) the Python code is compiled to machine code for execution at native machine code speed!
 
@@ -52,6 +52,32 @@ then calculate the rectangle.
 ```python
 lir.lir(grid, contour) # array([2, 2, 4, 7])
 ```
+
+You can also calculate the lir from a list of polygon coordinates. 
+
+```python
+import numpy as np
+import cv2 as cv
+import largestinteriorrectangle as lir
+
+polygon = np.array([[[20, 15], [210, 10], [220, 100], [100, 150], [20, 100]]], np.int32)
+rectangle = lir.lir(polygon)
+
+img = np.zeros((160, 240, 3), dtype="uint8")
+
+cv.polylines(img, [polygon], True, (0, 0, 255), 1)
+cv.rectangle(img, lir.pt1(rectangle), lir.pt2(rectangle), (255, 0, 0), 1)
+
+cv.imshow('lir', img)
+cv.waitKey(0)
+cv.destroyAllWindows()
+```
+
+![from_polygon](https://github.com/lukasalexanderweber/lir/blob/main/ext/readme_imgs/from_polygon.png?raw=true)
+
+In the background, a grid is created with `cv.fillPoly` (OpenCV is needed as optional dependency), on which the contour is computed and the lir based on contour is used.
+
+See also my [answer in this SO question](https://stackoverflow.com/questions/70362355/finding-largest-inscribed-rectangle-in-polygon/74736411#74736411).
 
 ## Contributing
 

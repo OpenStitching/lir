@@ -26,8 +26,7 @@ class TestLIRwithinOutlines(unittest.TestCase):
 
         grid = np.uint8(grid * 255)
 
-        contours, _ = \
-            cv.findContours(grid, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
+        contours, _ = cv.findContours(grid, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
         contour = contours[0][:, 0, :]
 
         grid = grid > 0
@@ -39,8 +38,7 @@ class TestLIRwithinOutlines(unittest.TestCase):
     def test_img(self):
         grid = cv.imread(os.path.join(TEST_DIR, "testdata", "mask.png"), 0)
 
-        contours, _ = \
-            cv.findContours(grid, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
+        contours, _ = cv.findContours(grid, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
         contour = contours[0][:, 0, :]
 
         grid = grid > 0
@@ -56,8 +54,7 @@ class TestLIRwithinMultipleOutlines(unittest.TestCase):
         grid = cv.imread(os.path.join(TEST_DIR, "testdata", "two_shapes.png"),
                          0)
 
-        contours, _ = \
-            cv.findContours(grid, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
+        contours, _ = cv.findContours(grid, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
         contour1 = contours[0][:, 0, :]
         contour2 = contours[1][:, 0, :]
 
