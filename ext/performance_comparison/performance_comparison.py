@@ -8,9 +8,8 @@ import matplotlib.ticker as ticker
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-import lir_within_outline  # noqa: F401, E402
-
 import lir  # noqa: F401, E402
+import lir_within_outline  # noqa: F401, E402
 
 # %%
 
