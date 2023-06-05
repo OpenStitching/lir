@@ -1,8 +1,8 @@
-import unittest
 import os
+import unittest
 
-import numpy as np
 import cv2 as cv
+import numpy as np
 
 from .context import lir_within_contour as lir
 
@@ -10,19 +10,22 @@ TEST_DIR = os.path.abspath(os.path.dirname(__file__))
 
 
 class TestLIRwithinOutlines(unittest.TestCase):
-
     def test_grid(self):
-        grid = np.array([[0, 0, 0, 1, 0, 1, 0, 0, 0],
-                         [0, 0, 1, 1, 0, 1, 1, 0, 0],
-                         [0, 1, 1, 1, 1, 1, 1, 1, 0],
-                         [1, 1, 1, 1, 1, 1, 1, 1, 1],
-                         [1, 1, 1, 1, 1, 1, 0, 0, 0],
-                         [0, 0, 1, 1, 1, 1, 1, 0, 0],
-                         [1, 1, 1, 1, 1, 1, 1, 1, 1],
-                         [1, 1, 1, 1, 1, 1, 1, 1, 1],
-                         [0, 1, 1, 1, 1, 1, 1, 1, 0],
-                         [0, 0, 1, 1, 0, 1, 1, 0, 0],
-                         [0, 0, 0, 1, 0, 1, 0, 0, 0]])
+        grid = np.array(
+            [
+                [0, 0, 0, 1, 0, 1, 0, 0, 0],
+                [0, 0, 1, 1, 0, 1, 1, 0, 0],
+                [0, 1, 1, 1, 1, 1, 1, 1, 0],
+                [1, 1, 1, 1, 1, 1, 1, 1, 1],
+                [1, 1, 1, 1, 1, 1, 0, 0, 0],
+                [0, 0, 1, 1, 1, 1, 1, 0, 0],
+                [1, 1, 1, 1, 1, 1, 1, 1, 1],
+                [1, 1, 1, 1, 1, 1, 1, 1, 1],
+                [0, 1, 1, 1, 1, 1, 1, 1, 0],
+                [0, 0, 1, 1, 0, 1, 1, 0, 0],
+                [0, 0, 0, 1, 0, 1, 0, 0, 0],
+            ]
+        )
 
         grid = np.uint8(grid * 255)
 
@@ -49,10 +52,8 @@ class TestLIRwithinOutlines(unittest.TestCase):
 
 
 class TestLIRwithinMultipleOutlines(unittest.TestCase):
-
     def test_multiple_shapes(self):
-        grid = cv.imread(os.path.join(TEST_DIR, "testdata", "two_shapes.png"),
-                         0)
+        grid = cv.imread(os.path.join(TEST_DIR, "testdata", "two_shapes.png"), 0)
 
         contours, _ = cv.findContours(grid, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
         contour1 = contours[0][:, 0, :]
