@@ -15,6 +15,14 @@ Use pip to install largestinteriorrectangle from [PyPI](https://pypi.org/project
 pip install largestinteriorrectangle
 ```
 
+:snail: Compiling the code takes some time (~1 minute on my computer).
+This is only required once after installation,
+the compiled code is then cached.
+If you want to do this outside your application, open a Python console
+and type `import largestinteriorrectangle`.
+You will see the console block for some time. When it is done
+a second import will only take milliseconds.
+
 ## Usage
 
 ```python
