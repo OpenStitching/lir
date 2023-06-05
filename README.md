@@ -16,7 +16,7 @@ pip install largestinteriorrectangle
 ```
 
 :snail: Compiling the code takes some time (~1 minute on my computer).
-This is only required once after installation, 
+This is only required once after installation,
 the compiled code is then cached.
 If you want to do this outside your application, open a Python console
 and type `import largestinteriorrectangle`.
