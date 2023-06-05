@@ -1,12 +1,12 @@
-import numpy as np
 import numba as nb
+import numpy as np
 
-from .lir_basis import horizontal_adjacency as horizontal_adjacency_left2right
-from .lir_basis import vertical_adjacency as vertical_adjacency_top2bottom
+from .lir_basis import biggest_span_in_span_map
 from .lir_basis import h_vector as h_vector_top2bottom
+from .lir_basis import horizontal_adjacency as horizontal_adjacency_left2right
+from .lir_basis import predict_vector_size, span_map, spans
 from .lir_basis import v_vector as v_vector_left2right
-from .lir_basis import (predict_vector_size, spans, span_map,
-                        biggest_span_in_span_map)
+from .lir_basis import vertical_adjacency as vertical_adjacency_top2bottom
 
 
 def largest_interior_rectangle(grid, contour):
@@ -23,7 +23,7 @@ def largest_interior_rectangle(grid, contour):
     return lir
 
 
-@nb.njit('uint32[:,::1](boolean[:,::1])', parallel=True, cache=True)
+@nb.njit("uint32[:,::1](boolean[:,::1])", parallel=True, cache=True)
 def horizontal_adjacency_right2left(grid):
     result = np.zeros(grid.shape, dtype=np.uint32)
     for y in nb.prange(grid.shape[0]):
@@ -37,7 +37,7 @@ def horizontal_adjacency_right2left(grid):
     return result
 
 
-@nb.njit('uint32[:,::1](boolean[:,::1])', parallel=True, cache=True)
+@nb.njit("uint32[:,::1](boolean[:,::1])", parallel=True, cache=True)
 def vertical_adjacency_bottom2top(grid):
     result = np.zeros(grid.shape, dtype=np.uint32)
     for x in nb.prange(grid.shape[1]):
@@ -60,13 +60,13 @@ def adjacencies_all_directions(grid):
     return h_left2right, h_right2left, v_top2bottom, v_bottom2top
 
 
-@nb.njit('uint32[:](uint32[:,::1], uint32, uint32)', cache=True)
+@nb.njit("uint32[:](uint32[:,::1], uint32, uint32)", cache=True)
 def h_vector_bottom2top(h_adjacency, x, y):
-    vector_size = predict_vector_size(np.flip(h_adjacency[:y+1, x]))
+    vector_size = predict_vector_size(np.flip(h_adjacency[: y + 1, x]))
     h_vector = np.zeros(vector_size, dtype=np.uint32)
     h = np.Inf
     for p in range(vector_size):
-        h = np.minimum(h_adjacency[y-p, x], h)
+        h = np.minimum(h_adjacency[y - p, x], h)
         h_vector[p] = h
     h_vector = np.unique(h_vector)[::-1]
     return h_vector
@@ -81,13 +81,13 @@ def h_vectors_all_directions(h_left2right, h_right2left, x, y):
     return h_l2r_t2b, h_r2l_t2b, h_l2r_b2t, h_r2l_b2t
 
 
-@nb.njit('uint32[:](uint32[:,::1], uint32, uint32)', cache=True)
+@nb.njit("uint32[:](uint32[:,::1], uint32, uint32)", cache=True)
 def v_vector_right2left(v_adjacency, x, y):
-    vector_size = predict_vector_size(np.flip(v_adjacency[y, :x+1]))
+    vector_size = predict_vector_size(np.flip(v_adjacency[y, : x + 1]))
     v_vector = np.zeros(vector_size, dtype=np.uint32)
     v = np.Inf
     for q in range(vector_size):
-        v = np.minimum(v_adjacency[y, x-q], v)
+        v = np.minimum(v_adjacency[y, x - q], v)
         v_vector[q] = v
     v_vector = np.unique(v_vector)[::-1]
     return v_vector
@@ -155,9 +155,12 @@ def cell_on_contour(x, y, contour):
     return np.any(both_true)
 
 
-@nb.njit('Tuple((uint32[:,:,::1], uint8[:,::1], boolean[:,::1]))'
-         '(UniTuple(uint32[:,::1], 4), uint32[:,::1])',
-         parallel=True, cache=True)
+@nb.njit(
+    "Tuple((uint32[:,:,::1], uint8[:,::1], boolean[:,::1]))"
+    "(UniTuple(uint32[:,::1], 4), uint32[:,::1])",
+    parallel=True,
+    cache=True,
+)
 def create_maps(adjacencies, contour):
     h_left2right, h_right2left, v_top2bottom, v_bottom2top = adjacencies
 
@@ -180,7 +183,7 @@ def create_maps(adjacencies, contour):
             for span_idx in range(span_array.shape[0]):
                 x, y = xy_array[span_idx][0], xy_array[span_idx][1]
                 w, h = span_array[span_idx][0], span_array[span_idx][1]
-                if w*h > span_map[y, x, 0] * span_map[y, x, 1]:
+                if w * h > span_map[y, x, 0] * span_map[y, x, 1]:
                     span_map[y, x, :] = np.array([w, h], "uint32")
                 if n == 3 and not cell_on_contour(x, y, contour):
                     saddle_candidates_map[y, x] = True

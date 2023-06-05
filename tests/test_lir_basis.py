@@ -1,8 +1,8 @@
-import unittest
 import os
+import unittest
 
-import numpy as np
 import cv2 as cv
+import numpy as np
 
 from .context import lir_basis as lir
 
@@ -10,20 +10,22 @@ TEST_DIR = os.path.abspath(os.path.dirname(__file__))
 
 
 class TestLIRbasis(unittest.TestCase):
-
     def test_lir(self):
-
-        grid = np.array([[0, 0, 1, 0, 0, 0, 0, 0, 0],
-                         [0, 0, 1, 0, 1, 1, 0, 0, 0],
-                         [0, 0, 1, 1, 1, 1, 1, 0, 0],
-                         [0, 0, 1, 1, 1, 1, 1, 1, 0],
-                         [0, 0, 1, 1, 1, 1, 1, 1, 0],
-                         [0, 1, 1, 1, 1, 1, 1, 0, 0],
-                         [0, 0, 1, 1, 1, 1, 0, 0, 0],
-                         [0, 0, 1, 1, 1, 1, 0, 0, 0],
-                         [1, 1, 1, 1, 1, 1, 0, 0, 0],
-                         [1, 1, 0, 0, 0, 1, 1, 1, 1],
-                         [0, 0, 0, 0, 0, 0, 0, 0, 0]])
+        grid = np.array(
+            [
+                [0, 0, 1, 0, 0, 0, 0, 0, 0],
+                [0, 0, 1, 0, 1, 1, 0, 0, 0],
+                [0, 0, 1, 1, 1, 1, 1, 0, 0],
+                [0, 0, 1, 1, 1, 1, 1, 1, 0],
+                [0, 0, 1, 1, 1, 1, 1, 1, 0],
+                [0, 1, 1, 1, 1, 1, 1, 0, 0],
+                [0, 0, 1, 1, 1, 1, 0, 0, 0],
+                [0, 0, 1, 1, 1, 1, 0, 0, 0],
+                [1, 1, 1, 1, 1, 1, 0, 0, 0],
+                [1, 1, 0, 0, 0, 1, 1, 1, 1],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            ]
+        )
         grid = grid > 0
 
         h = lir.horizontal_adjacency(grid)
@@ -36,12 +38,9 @@ class TestLIRbasis(unittest.TestCase):
         np.testing.assert_array_equal(rect, rect2)
 
     def test_spans(self):
-        grid = np.array([[1, 1, 1],
-                         [1, 1, 0],
-                         [1, 0, 0],
-                         [1, 0, 0],
-                         [1, 0, 0],
-                         [1, 1, 1]])
+        grid = np.array(
+            [[1, 1, 1], [1, 1, 0], [1, 0, 0], [1, 0, 0], [1, 0, 0], [1, 1, 1]]
+        )
         grid = grid > 0
 
         h = lir.horizontal_adjacency(grid)
@@ -52,9 +51,7 @@ class TestLIRbasis(unittest.TestCase):
 
         np.testing.assert_array_equal(v_vector, np.array([6, 2, 1]))
         np.testing.assert_array_equal(h_vector, np.array([3, 2, 1]))
-        np.testing.assert_array_equal(spans, np.array([[3, 1],
-                                                       [2, 2],
-                                                       [1, 6]]))
+        np.testing.assert_array_equal(spans, np.array([[3, 1], [2, 2], [1, 6]]))
 
     def test_vector_size(self):
         t0 = np.array([1, 1, 1, 1], dtype=np.uint32)
