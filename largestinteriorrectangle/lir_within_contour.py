@@ -64,7 +64,7 @@ def adjacencies_all_directions(grid):
 def h_vector_bottom2top(h_adjacency, x, y):
     vector_size = predict_vector_size(np.flip(h_adjacency[: y + 1, x]))
     h_vector = np.zeros(vector_size, dtype=np.uint32)
-    h = np.Inf
+    h = np.inf
     for p in range(vector_size):
         h = np.minimum(h_adjacency[y - p, x], h)
         h_vector[p] = h
@@ -85,7 +85,7 @@ def h_vectors_all_directions(h_left2right, h_right2left, x, y):
 def v_vector_right2left(v_adjacency, x, y):
     vector_size = predict_vector_size(np.flip(v_adjacency[y, : x + 1]))
     v_vector = np.zeros(vector_size, dtype=np.uint32)
-    v = np.Inf
+    v = np.inf
     for q in range(vector_size):
         v = np.minimum(v_adjacency[y, x - q], v)
         v_vector[q] = v
