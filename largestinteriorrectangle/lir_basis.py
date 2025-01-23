@@ -1,116 +1,169 @@
-import numba as nb
+import math
+
 import numpy as np
 
 
-def largest_interior_rectangle(grid):
-    h_adjacency = horizontal_adjacency(grid)
-    v_adjacency = vertical_adjacency(grid)
-    s_map = span_map(grid, h_adjacency, v_adjacency)
-    return biggest_span_in_span_map(s_map)
+def _trim_grid(grid: np.array, center, target_ratio=0.00):
+    assert target_ratio >= 0, "target_ratio cannot be negative!"
+    rows, cols = grid.shape
+    center_x, center_y = center
+
+    left_edge = center_x
+    for x in range(center_x, -1, -1):
+        if not grid[center_y, x]:
+            break
+        left_edge = x
+
+    right_edge = center_x
+    for x in range(center_x, cols):
+        if not grid[center_y, x]:
+            break
+        right_edge = x
+
+    up_edge = center_y
+    for y in range(center_y, -1, -1):
+        if not grid[y, center_x]:
+            break
+        up_edge = y
+
+    down_edge = center_y
+    for y in range(center_y, rows):
+        if not grid[y, center_x]:
+            break
+        down_edge = y
+
+    half_trimmed_x_range = min(right_edge - center_x, center_x - left_edge)
+    half_trimmed_y_range = min(down_edge - center_y, center_y - up_edge)
+    x_min = max(center_x - half_trimmed_x_range, 0)
+    x_max = min(center_x + half_trimmed_x_range, cols - 1)
+    y_min = max(center_y - half_trimmed_y_range, 0)
+    y_max = min(center_y + half_trimmed_y_range, rows - 1)
+
+    if target_ratio:
+        w = x_max - x_min
+        h = y_max - y_min
+        if w > h:
+            w = h * target_ratio
+            x_min = int(center_x - w // 2)
+            x_max = int(center_x + w // 2)
+        else:
+            h = w / target_ratio
+            y_min = int(center_y - h // 2)
+            y_max = int(center_y + h // 2)
+
+    trimmed_grid = np.zeros_like(grid)
+    trimmed_grid[y_min : y_max + 1, x_min : x_max + 1] = grid[
+        y_min : y_max + 1, x_min : x_max + 1
+    ]
+    return trimmed_grid
 
 
-@nb.njit("uint32[:,::1](boolean[:,::1])", parallel=True, cache=True)
-def horizontal_adjacency(grid):
-    result = np.zeros((grid.shape[0], grid.shape[1]), dtype=np.uint32)
-    for y in nb.prange(grid.shape[0]):
-        span = 0
-        for x in range(grid.shape[1] - 1, -1, -1):
-            if grid[y, x]:
-                span += 1
-            else:
-                span = 0
-            result[y, x] = span
-    return result
+def _get_step(target_ratio, step_max=20):
+    scale_factor = 100000  # Scale up to avoid floating point precision issues
+    x_step = y_step = step_max + 1
+    while (x_step > step_max or y_step > step_max) and scale_factor:
+        width = target_ratio
+        height = int(scale_factor)
+        width = int(width * scale_factor)
+        width = width + 1 if width % 2 else width
+
+        gcd = math.gcd(width, height)  # Compute the GCD
+
+        x_step = width // gcd
+        y_step = height // gcd
+        scale_factor /= 10
+
+    return x_step, y_step
 
 
-@nb.njit("uint32[:,::1](boolean[:,::1])", parallel=True, cache=True)
-def vertical_adjacency(grid):
-    result = np.zeros((grid.shape[0], grid.shape[1]), dtype=np.uint32)
-    for x in nb.prange(grid.shape[1]):
-        span = 0
-        for y in range(grid.shape[0] - 1, -1, -1):
-            if grid[y, x]:
-                span += 1
-            else:
-                span = 0
-            result[y, x] = span
-    return result
+def largest_interior_rectangle(
+    grid: np.array, target_ratio=0.00, ratio_tolerance=0.01, target_center_coord=None
+) -> np.array:
+    rows, cols = grid.shape
+    max_area = 0
+    max_rect = (0, 0, 0, 0)  # (x1, y1, x2, y2)
 
+    if target_center_coord:
+        # Check if center_coord is in the grid
+        center_x, center_y = target_center_coord
+        if (
+            0 <= center_x < cols
+            and 0 <= center_y < rows
+            and grid[center_y, center_x] == 1
+        ):
+            grid = _trim_grid(grid, target_center_coord, target_ratio=target_ratio)
+            x_step, y_step = _get_step(target_ratio)
+            x_extend = y_extend = 0
+            # TODO: simplify this ugly while and that ugly if in it
+            while (
+                center_y + y_extend < rows
+                and center_y - y_extend >= 0
+                and center_x + x_extend < cols
+                and center_x - x_extend >= 0
+                and grid[center_y + y_extend, center_x]
+                and grid[center_y - y_extend, center_x]
+                and grid[center_y, center_x + x_extend]
+                and grid[center_y, center_x - x_extend]
+            ):
+                y_extend += y_step
+                x_extend += x_step
+                if (
+                    center_y - y_extend >= 0
+                    and center_y + y_extend < rows
+                    and center_x - x_extend >= 0
+                    and center_x + x_extend < cols
+                    and grid[
+                        center_y - y_extend : center_y + y_extend + 1,
+                        center_x - x_extend : center_x + x_extend + 1,
+                    ].all()
+                ):
+                    max_area = max(max_area, (x_extend * 2) * (y_extend * 2))
+                    max_rect = (
+                        center_x - x_extend,
+                        center_y - y_extend,
+                        center_x + x_extend,
+                        center_y + y_extend,
+                    )
+        else:
+            print(f"⚠️Center coordinate is not in the grid! ({grid.shape = })")
 
-@nb.njit("uint32(uint32[:])", cache=True)
-def predict_vector_size(array):
-    zero_indices = np.where(array == 0)[0]
-    if len(zero_indices) == 0:
-        if len(array) == 0:
-            return 0
-        return len(array)
-    return zero_indices[0]
+    else:  # auto mode
+        # ref: LeetCode 84. Largest Rectangle in Histogram
+        heights = np.zeros(cols)
+        for y2 in range(rows):
+            if (
+                rows - y2
+            ) * cols < max_area:  # The remaining area is smaller than the max area
+                break
 
+            heights = (heights + 1) * grid[y2, :]  # compute the heights (histogram)
+            stack = []  # reset stack at every row
+            for x2 in range(cols + 1):
+                if (rows - y2) * (
+                    cols + 1 - x2
+                ) < max_area:  # The remaining area is smaller than the max area
+                    break
 
-@nb.njit("uint32[:](uint32[:,::1], uint32, uint32)", cache=True)
-def h_vector(h_adjacency, x, y):
-    vector_size = predict_vector_size(h_adjacency[y:, x])
-    h_vector = np.zeros(vector_size, dtype=np.uint32)
-    h = np.inf
-    for p in range(vector_size):
-        h = np.minimum(h_adjacency[y + p, x], h)
-        h_vector[p] = h
-    h_vector = np.unique(h_vector)[::-1]
-    return h_vector
+                while stack and (x2 == cols or heights[stack[-1]] > heights[x2]):
+                    height = heights[stack.pop()]
+                    width = x2 if not stack else x2 - stack[-1] - 1
+                    curr_ratio = (
+                        width / height if height > 0 else 0
+                    )  # prevent ZeroDivisionError
+                    if (
+                        target_ratio * (1 - ratio_tolerance)
+                        <= curr_ratio
+                        <= target_ratio * (1 + ratio_tolerance)
+                        or target_ratio == 0
+                    ):
+                        area = width * height
+                        x1 = 0 if not stack else stack[-1] + 1
+                        rect = (x1, y2 - height + 1, x2 - 1, y2)
+                        if area > max_area:
+                            max_area = area
+                            max_rect = rect
 
+                stack.append(x2)
 
-@nb.njit("uint32[:](uint32[:,::1], uint32, uint32)", cache=True)
-def v_vector(v_adjacency, x, y):
-    vector_size = predict_vector_size(v_adjacency[y, x:])
-    v_vector = np.zeros(vector_size, dtype=np.uint32)
-    v = np.inf
-    for q in range(vector_size):
-        v = np.minimum(v_adjacency[y, x + q], v)
-        v_vector[q] = v
-    v_vector = np.unique(v_vector)[::-1]
-    return v_vector
-
-
-@nb.njit("uint32[:,:](uint32[:], uint32[:])", cache=True)
-def spans(h_vector, v_vector):
-    spans = np.stack((h_vector, v_vector[::-1]), axis=1)
-    return spans
-
-
-@nb.njit("uint32[:](uint32[:,:])", cache=True)
-def biggest_span(spans):
-    if len(spans) == 0:
-        return np.array([0, 0], dtype=np.uint32)
-    areas = spans[:, 0] * spans[:, 1]
-    biggest_span_index = np.where(areas == np.amax(areas))[0][0]
-    return spans[biggest_span_index]
-
-
-@nb.njit(
-    "uint32[:, :, :](boolean[:,::1], uint32[:,::1], uint32[:,::1])",
-    parallel=True,
-    cache=True,
-)
-def span_map(grid, h_adjacency, v_adjacency):
-    y_values, x_values = grid.nonzero()
-    span_map = np.zeros(grid.shape + (2,), dtype=np.uint32)
-
-    for idx in nb.prange(len(x_values)):
-        x, y = x_values[idx], y_values[idx]
-        h_vec = h_vector(h_adjacency, x, y)
-        v_vec = v_vector(v_adjacency, x, y)
-        s = spans(h_vec, v_vec)
-        s = biggest_span(s)
-        span_map[y, x, :] = s
-
-    return span_map
-
-
-@nb.njit("uint32[:](uint32[:, :, :])", cache=True)
-def biggest_span_in_span_map(span_map):
-    areas = span_map[:, :, 0] * span_map[:, :, 1]
-    largest_rectangle_indices = np.where(areas == np.amax(areas))
-    x = largest_rectangle_indices[1][0]
-    y = largest_rectangle_indices[0][0]
-    span = span_map[y, x]
-    return np.array([x, y, span[0], span[1]], dtype=np.uint32)
+    x1, y1, x2, y2 = max_rect
+    return np.array([x1, y1, x2 - x1, y2 - y1], dtype="int")
