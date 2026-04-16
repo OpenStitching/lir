@@ -5,13 +5,22 @@ from .lir_within_contour import largest_interior_rectangle as lir_contour
 cv = None  # as an optional dependency opencv will only be imported if needed
 
 
-def largest_interior_rectangle(polygon):
+def largest_interior_rectangle(
+    polygon, target_ratio=None, target_center=None, tolerance=None
+):
     check_for_opencv()
     origin, mask = create_mask_from_polygon(polygon)
     contours, _ = cv.findContours(mask, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
     contour = contours[0][:, 0, :]
     mask = mask > 0
-    lir = lir_contour(mask, contour)
+    target_center_local = None
+    if target_center is not None:
+        target_center_local = (
+            float(target_center[0]) - float(origin[0]),
+            float(target_center[1]) - float(origin[1]),
+        )
+
+    lir = lir_contour(mask, contour, target_ratio, target_center_local, tolerance)
     lir = lir.astype(np.int32)
     lir[0:2] = lir[0:2] + origin
     return lir

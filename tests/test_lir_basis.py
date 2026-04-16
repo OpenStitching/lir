@@ -30,12 +30,47 @@ class TestLIRbasis(unittest.TestCase):
 
         h = lir.horizontal_adjacency(grid)
         v = lir.vertical_adjacency(grid)
-        span_map = lir.span_map(grid, h, v)
+        span_map = lir.span_map(grid, h, v, 0)
         rect = lir.biggest_span_in_span_map(span_map)
         rect2 = lir.largest_interior_rectangle(grid)
 
         np.testing.assert_array_equal(rect, np.array([2, 2, 4, 7]))
         np.testing.assert_array_equal(rect, rect2)
+
+    def test_constrained_lir(self):
+        grid = np.array(
+            [
+                [0, 0, 1, 0, 0, 0, 0, 0, 0],
+                [0, 0, 1, 0, 1, 1, 0, 0, 0],
+                [0, 0, 1, 1, 1, 1, 1, 0, 0],
+                [0, 0, 1, 1, 1, 1, 1, 1, 0],
+                [0, 0, 1, 1, 1, 1, 1, 1, 0],
+                [0, 1, 1, 1, 1, 1, 1, 0, 0],
+                [0, 0, 1, 1, 1, 1, 0, 0, 0],
+                [0, 0, 1, 1, 1, 1, 0, 0, 0],
+                [1, 1, 1, 1, 1, 1, 0, 0, 0],
+                [1, 1, 0, 0, 0, 1, 1, 1, 1],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            ]
+        )
+        grid = grid > 0
+
+        target_ratio = 2
+
+        h = lir.horizontal_adjacency(grid)
+        v = lir.vertical_adjacency(grid)
+        span_map = lir.span_map(grid, h, v, target_ratio)
+        rect = lir.biggest_span_in_span_map(span_map)
+        rect2 = lir.largest_interior_rectangle(grid, target_ratio)
+
+        np.testing.assert_array_equal(rect, np.array([2, 2, 5, 2]))
+        np.testing.assert_array_equal(rect, rect2)
+
+        rect3 = lir.biggest_span_in_span_map_closest_to_center(span_map, (5, 5))
+        rect4 = lir.largest_interior_rectangle(grid, target_ratio, (5, 5), 0)
+
+        np.testing.assert_array_equal(rect3, np.array([2, 4, 5, 2]))
+        np.testing.assert_array_equal(rect3, rect4)
 
     def test_spans(self):
         grid = np.array(
