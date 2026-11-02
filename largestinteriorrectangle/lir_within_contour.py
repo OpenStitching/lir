@@ -1,10 +1,9 @@
 import numba as nb
 import numpy as np
 
-from .lir_basis import biggest_span_in_span_map
+from .lir_basis import biggest_span_in_span_map, predict_vector_size, span_map, spans
 from .lir_basis import h_vector as h_vector_top2bottom
 from .lir_basis import horizontal_adjacency as horizontal_adjacency_left2right
-from .lir_basis import predict_vector_size, span_map, spans
 from .lir_basis import v_vector as v_vector_left2right
 from .lir_basis import vertical_adjacency as vertical_adjacency_top2bottom
 
