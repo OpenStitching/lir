@@ -40,9 +40,7 @@ def check_for_opencv():
 
             cv = cv2
         except Exception:
-            raise ImportError(
-                """
+            raise ImportError("""
                 Missing optional dependency 'opencv-python' to compute lir
                 based on polygon. Use pip or conda to install it.
-                """
-            )
+                """)
